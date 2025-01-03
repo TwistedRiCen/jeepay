@@ -36,12 +36,12 @@ import com.jeequan.jeepay.pay.util.ApiResBuilder;
 import org.springframework.stereotype.Service;
 
 /*
-* 支付宝 PC支付
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:21
-*/
+ * 支付宝 PC支付
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:21
+ */
 @Service("alipayPaymentByAliPcService") //Service Name需保持全局唯一性
 public class AliPc extends AlipayPaymentService {
 
@@ -51,7 +51,7 @@ public class AliPc extends AlipayPaymentService {
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext){
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
 
         AliPcOrderRQ bizRQ = (AliPcOrderRQ) rq;
 
@@ -75,12 +75,12 @@ public class AliPc extends AlipayPaymentService {
         AliPcOrderRS res = ApiResBuilder.buildSuccess(AliPcOrderRS.class);
 
         try {
-            if(CS.PAY_DATA_TYPE.FORM.equals(bizRQ.getPayDataType())){
+            if (CS.PAY_DATA_TYPE.FORM.equals(bizRQ.getPayDataType())) {
                 res.setFormContent(configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).getAlipayClient().pageExecute(req).getBody());
-            }else{
+            } else {
                 res.setPayUrl(configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).getAlipayClient().pageExecute(req, "GET").getBody());
             }
-        }catch (AlipayApiException e) {
+        } catch (AlipayApiException e) {
             throw ChannelException.sysError(e.getMessage());
         }
 

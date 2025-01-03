@@ -19,23 +19,23 @@ import com.alibaba.fastjson.JSONObject;
 import com.jeequan.jeepay.core.entity.PayOrder;
 import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.pay.channel.ysfpay.YsfpayPaymentService;
+import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
+import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
+import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.AliBarOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.AliBarOrderRS;
-import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
-import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.util.ApiResBuilder;
-import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 /*
-* 云闪付 支付宝 条码支付
-*
-* @author pangxiaoyu
-* @site https://www.jeequan.com
-* @date 2021/6/8 18:11
-*/
+ * 云闪付 支付宝 条码支付
+ *
+ * @author pangxiaoyu
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 18:11
+ */
 @Service("ysfPaymentByAliBarService") //Service Name需保持全局唯一性
 public class AliBar extends YsfpayPaymentService {
 
@@ -43,7 +43,7 @@ public class AliBar extends YsfpayPaymentService {
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
 
         AliBarOrderRQ bizRQ = (AliBarOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getAuthCode())){
+        if (StringUtils.isEmpty(bizRQ.getAuthCode())) {
             throw new BizException("用户支付条码[authCode]不可为空");
         }
 
@@ -64,7 +64,7 @@ public class AliBar extends YsfpayPaymentService {
         barParamsSet(reqParams, payOrder);
 
         //客户端IP
-        reqParams.put("termInfo", "{\"ip\": \""+StringUtils.defaultIfEmpty(payOrder.getClientIp(), "127.0.0.1")+"\"}"); //终端信息
+        reqParams.put("termInfo", "{\"ip\": \"" + StringUtils.defaultIfEmpty(payOrder.getClientIp(), "127.0.0.1") + "\"}"); //终端信息
 
         // 发送请求
         JSONObject resJSON = packageParamAndReq("/gateway/api/pay/micropay", reqParams, logPrefix, mchAppConfigContext);
@@ -74,18 +74,18 @@ public class AliBar extends YsfpayPaymentService {
         try {
 
             //00-交易成功， 02-用户支付中 , 12-交易重复， 需要发起查询处理    其他认为失败
-            if("00".equals(respCode)){
+            if ("00".equals(respCode)) {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
                 res.setPayData(resJSON.getString("payData"));
-            }else if("02".equals(respCode) ||"12".equals(respCode) || "99".equals(respCode)){
+            } else if ("02".equals(respCode) || "12".equals(respCode) || "99".equals(respCode)) {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
                 channelRetMsg.setNeedQuery(true); // 开启轮询查单
-            }else{
+            } else {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
                 channelRetMsg.setChannelErrCode(respCode);
                 channelRetMsg.setChannelErrMsg(respMsg);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             channelRetMsg.setChannelErrCode(respCode);
             channelRetMsg.setChannelErrMsg(respMsg);
         }

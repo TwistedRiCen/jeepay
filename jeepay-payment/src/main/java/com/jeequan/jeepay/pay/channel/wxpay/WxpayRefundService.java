@@ -57,7 +57,9 @@ public class WxpayRefundService extends AbstractRefundService {
         return null;
     }
 
-    /** 微信退款接口 **/
+    /**
+     * 微信退款接口
+     **/
     @Override
     public ChannelRetMsg refund(RefundOrderRQ bizRQ, RefundOrder refundOrder, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception {
         try {
@@ -81,15 +83,15 @@ public class WxpayRefundService extends AbstractRefundService {
                 WxPayService wxPayService = wxServiceWrapper.getWxPayService();
 
                 WxPayRefundResult result = wxPayService.refundV2(req);
-                if("SUCCESS".equals(result.getResultCode())){ // 退款发起成功,结果主动查询
+                if ("SUCCESS".equals(result.getResultCode())) { // 退款发起成功,结果主动查询
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
                     channelRetMsg.setChannelOrderId(result.getRefundId());
-                }else{
+                } else {
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
                     channelRetMsg.setChannelErrCode(result.getErrCode());
                     channelRetMsg.setChannelErrMsg(WxpayKit.appendErrMsg(result.getReturnMsg(), result.getErrCodeDes()));
                 }
-            }else if (CS.PAY_IF_VERSION.WX_V3.equals(wxServiceWrapper.getApiVersion())) {   //V3
+            } else if (CS.PAY_IF_VERSION.WX_V3.equals(wxServiceWrapper.getApiVersion())) {   //V3
                 // 微信统一下单请求对象
                 JSONObject reqJSON = new JSONObject();
                 reqJSON.put("out_trade_no", refundOrder.getPayOrderId());   // 订单号
@@ -102,22 +104,22 @@ public class WxpayRefundService extends AbstractRefundService {
                 amountJson.put("currency", "CNY");// 币种
                 reqJSON.put("amount", amountJson);
 
-                if(mchAppConfigContext.isIsvsubMch()){ // 特约商户
-                    WxpayIsvsubMchParams isvsubMchParams = (WxpayIsvsubMchParams)configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+                if (mchAppConfigContext.isIsvsubMch()) { // 特约商户
+                    WxpayIsvsubMchParams isvsubMchParams = (WxpayIsvsubMchParams) configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
                     reqJSON.put("sub_mchid", isvsubMchParams.getSubMchId());
                 }
 
                 JSONObject resultJSON = WxpayV3Util.refundV3(reqJSON, wxServiceWrapper.getWxPayService());
                 String status = resultJSON.getString("status");
-                if("SUCCESS".equals(status)){ // 退款成功
+                if ("SUCCESS".equals(status)) { // 退款成功
                     String refundId = resultJSON.getString("refund_id");
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
                     channelRetMsg.setChannelOrderId(refundId);
-                }else if ("PROCESSING".equals(status)){ // 退款处理中
+                } else if ("PROCESSING".equals(status)) { // 退款处理中
                     String refundId = resultJSON.getString("refund_id");
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
                     channelRetMsg.setChannelOrderId(refundId);
-                }else{
+                } else {
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
                     channelRetMsg.setChannelErrMsg(status);
                 }
@@ -136,7 +138,9 @@ public class WxpayRefundService extends AbstractRefundService {
         }
     }
 
-    /** 微信退款查单接口 **/
+    /**
+     * 微信退款查单接口
+     **/
     @Override
     public ChannelRetMsg query(RefundOrder refundOrder, MchAppConfigContext mchAppConfigContext) throws Exception {
         try {
@@ -156,27 +160,27 @@ public class WxpayRefundService extends AbstractRefundService {
                 WxPayService wxPayService = wxServiceWrapper.getWxPayService();
 
                 WxPayRefundQueryResult result = wxPayService.refundQueryV2(req);
-                if("SUCCESS".equals(result.getResultCode())){ // 退款成功
+                if ("SUCCESS".equals(result.getResultCode())) { // 退款成功
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-                }else{
+                } else {
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
                     channelRetMsg.setChannelErrMsg(result.getReturnMsg());
                 }
 
-            }else if (CS.PAY_IF_VERSION.WX_V3.equals(wxServiceWrapper.getApiVersion())) {   //V3
+            } else if (CS.PAY_IF_VERSION.WX_V3.equals(wxServiceWrapper.getApiVersion())) {   //V3
                 WxPayService wxPayService = wxServiceWrapper.getWxPayService();
                 JSONObject resultJSON = null;
                 if (mchAppConfigContext.isIsvsubMch()) {
-                    WxpayIsvsubMchParams isvsubMchParams = (WxpayIsvsubMchParams)configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+                    WxpayIsvsubMchParams isvsubMchParams = (WxpayIsvsubMchParams) configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
                     wxPayService.getConfig().setSubMchId(isvsubMchParams.getSubMchId());
                     resultJSON = WxpayV3Util.refundQueryV3Isv(refundOrder.getRefundOrderId(), wxPayService);
-                }else {
+                } else {
                     resultJSON = WxpayV3Util.refundQueryV3(refundOrder.getRefundOrderId(), wxPayService);
                 }
                 String status = resultJSON.getString("status");
-                if("SUCCESS".equals(status)){ // 退款成功
+                if ("SUCCESS".equals(status)) { // 退款成功
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-                }else{
+                } else {
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
                     channelRetMsg.setChannelErrMsg(status);
                 }

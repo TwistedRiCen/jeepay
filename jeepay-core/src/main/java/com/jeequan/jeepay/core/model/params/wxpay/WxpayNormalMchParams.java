@@ -77,7 +77,9 @@ public class WxpayNormalMchParams extends NormalMchParams {
      **/
     private String cert;
 
-    /** 证书文件(.pem格式) **/
+    /**
+     * 证书文件(.pem格式)
+     **/
     private String apiClientCert;
 
     /**

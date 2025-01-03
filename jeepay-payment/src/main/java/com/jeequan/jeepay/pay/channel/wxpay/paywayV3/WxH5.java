@@ -82,9 +82,9 @@ public class WxH5 extends WxpayPaymentService {
 
             payUrl = String.format("%s/api/common/payUrl/%s", sysConfigService.getDBApplicationConfig().getPaySiteUrl(), Base64.encode(payUrl));
 
-            if (CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(bizRQ.getPayDataType())){ //二维码图片地址
+            if (CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(bizRQ.getPayDataType())) { //二维码图片地址
                 res.setCodeImgUrl(sysConfigService.getDBApplicationConfig().genScanImgUrl(payUrl));
-            }else{ // 默认都为 payUrl方式
+            } else { // 默认都为 payUrl方式
                 res.setPayUrl(payUrl);
             }
 

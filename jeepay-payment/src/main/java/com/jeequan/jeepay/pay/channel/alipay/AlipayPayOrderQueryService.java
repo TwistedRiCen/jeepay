@@ -28,16 +28,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /*
-* 支付宝 查单接口实现类
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:20
-*/
+ * 支付宝 查单接口实现类
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:20
+ */
 @Service
 public class AlipayPayOrderQueryService implements IPayOrderQueryService {
 
-    @Autowired private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
 
     @Override
     public String getIfCode() {
@@ -45,7 +46,7 @@ public class AlipayPayOrderQueryService implements IPayOrderQueryService {
     }
 
     @Override
-    public ChannelRetMsg query(PayOrder payOrder, MchAppConfigContext mchAppConfigContext){
+    public ChannelRetMsg query(PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
 
         AlipayTradeQueryRequest req = new AlipayTradeQueryRequest();
 
@@ -60,9 +61,9 @@ public class AlipayPayOrderQueryService implements IPayOrderQueryService {
         AlipayTradeQueryResponse resp = configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).execute(req);
         String result = resp.getTradeStatus();
 
-        if("TRADE_SUCCESS".equals(result)) {
+        if ("TRADE_SUCCESS".equals(result)) {
             return ChannelRetMsg.confirmSuccess(resp.getTradeNo());  //支付成功
-        }else if("WAIT_BUYER_PAY".equals(result)) {
+        } else if ("WAIT_BUYER_PAY".equals(result)) {
             return ChannelRetMsg.waiting(); //支付中
         }
         return ChannelRetMsg.waiting(); //支付中

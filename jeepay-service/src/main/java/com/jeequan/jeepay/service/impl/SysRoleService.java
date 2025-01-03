@@ -20,10 +20,10 @@ import com.jeequan.jeepay.core.entity.SysRole;
 import com.jeequan.jeepay.core.entity.SysRoleEntRela;
 import com.jeequan.jeepay.core.entity.SysUserRoleRela;
 import com.jeequan.jeepay.core.exception.BizException;
+import com.jeequan.jeepay.service.mapper.SysRoleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.jeequan.jeepay.service.mapper.SysRoleMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +39,17 @@ import java.util.List;
 @Service
 public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
 
-    @Autowired private SysUserRoleRelaService sysUserRoleRelaService;
+    @Autowired
+    private SysUserRoleRelaService sysUserRoleRelaService;
 
-    @Autowired private SysRoleEntRelaService sysRoleEntRelaService;
+    @Autowired
+    private SysRoleEntRelaService sysRoleEntRelaService;
 
 
-    /** 根据用户查询全部角色集合 **/
-    public List<String> findListByUser(Long sysUserId){
+    /**
+     * 根据用户查询全部角色集合
+     **/
+    public List<String> findListByUser(Long sysUserId) {
         List<String> result = new ArrayList<>();
         sysUserRoleRelaService.list(
                 SysUserRoleRela.gw().eq(SysUserRoleRela::getUserId, sysUserId)
@@ -56,9 +60,9 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
 
 
     @Transactional
-    public void removeRole(String roleId){
+    public void removeRole(String roleId) {
 
-        if(sysUserRoleRelaService.count(SysUserRoleRela.gw().eq(SysUserRoleRela::getRoleId, roleId)) > 0){
+        if (sysUserRoleRelaService.count(SysUserRoleRela.gw().eq(SysUserRoleRela::getRoleId, roleId)) > 0) {
             throw new BizException("当前角色已分配到用户， 不可删除！");
         }
 
@@ -69,7 +73,6 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
         sysRoleEntRelaService.remove(SysRoleEntRela.gw().eq(SysRoleEntRela::getRoleId, roleId));
 
     }
-
 
 
 }

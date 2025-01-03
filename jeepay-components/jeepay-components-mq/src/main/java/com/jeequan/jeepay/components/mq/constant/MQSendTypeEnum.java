@@ -16,14 +16,19 @@
 package com.jeequan.jeepay.components.mq.constant;
 
 /**
-* 定义MQ消息类型
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/7/23 16:49
-*/
+ * 定义MQ消息类型
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/7/23 16:49
+ */
 public enum MQSendTypeEnum {
-    /** QUEUE - 点对点 （只有1个消费者可消费。 ActiveMQ的queue模式 ） **/
+    /**
+     * QUEUE - 点对点 （只有1个消费者可消费。 ActiveMQ的queue模式 ）
+     **/
     QUEUE,
-    /** BROADCAST - 订阅模式 (所有接收者都可接收到。 ActiveMQ的topic模式, RabbitMQ的fanout类型的交换机, RocketMQ的广播模式  ) **/
+    /**
+     * BROADCAST - 订阅模式 (所有接收者都可接收到。 ActiveMQ的topic模式, RabbitMQ的fanout类型的交换机, RocketMQ的广播模式  )
+     **/
     BROADCAST
 }

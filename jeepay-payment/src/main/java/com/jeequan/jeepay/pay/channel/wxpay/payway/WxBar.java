@@ -24,14 +24,14 @@ import com.jeequan.jeepay.core.entity.PayOrder;
 import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.pay.channel.wxpay.WxpayPaymentService;
 import com.jeequan.jeepay.pay.channel.wxpay.kits.WxpayKit;
+import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.model.WxServiceWrapper;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
+import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxBarOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxBarOrderRS;
-import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.util.ApiResBuilder;
-import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +49,7 @@ public class WxBar extends WxpayPaymentService {
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
 
         WxBarOrderRQ bizRQ = (WxBarOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getAuthCode())){
+        if (StringUtils.isEmpty(bizRQ.getAuthCode())) {
             throw new BizException("用户支付条码[authCode]不可为空");
         }
 
@@ -57,7 +57,7 @@ public class WxBar extends WxpayPaymentService {
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception{
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception {
 
         WxBarOrderRQ bizRQ = (WxBarOrderRQ) rq;
 
@@ -72,7 +72,7 @@ public class WxBar extends WxpayPaymentService {
         request.setAuthCode(bizRQ.getAuthCode().trim());
 
         //订单分账， 将冻结商户资金。
-        if(isDivisionOrder(payOrder)){
+        if (isDivisionOrder(payOrder)) {
             request.setProfitSharing("Y");
         }
 
@@ -98,12 +98,12 @@ public class WxBar extends WxpayPaymentService {
 
         } catch (WxPayException e) {
             //微信返回支付状态为【支付结果未知】, 需进行查单操作
-            if("SYSTEMERROR".equals(e.getErrCode()) || "USERPAYING".equals(e.getErrCode()) ||  "BANKERROR".equals(e.getErrCode())){
+            if ("SYSTEMERROR".equals(e.getErrCode()) || "USERPAYING".equals(e.getErrCode()) || "BANKERROR".equals(e.getErrCode())) {
 
                 //轮询查询订单
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
                 channelRetMsg.setNeedQuery(true);
-            }else {
+            } else {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
                 WxpayKit.commonSetErrInfo(channelRetMsg, e);
             }

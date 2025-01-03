@@ -25,25 +25,30 @@ import java.util.List;
 @Service
 public class PayOrderDivisionRecordService extends ServiceImpl<PayOrderDivisionRecordMapper, PayOrderDivisionRecord> {
 
-    @Autowired private PayOrderMapper payOrderMapper;
+    @Autowired
+    private PayOrderMapper payOrderMapper;
 
 
-    /** 更新分账记录为分账成功  ( 单条 )  将：  已受理 更新为： 其他状态    **/
-    public void updateRecordSuccessOrFailBySingleItem(Long recordId, Byte state, String channelRespResult){
+    /**
+     * 更新分账记录为分账成功  ( 单条 )  将：  已受理 更新为： 其他状态
+     **/
+    public void updateRecordSuccessOrFailBySingleItem(Long recordId, Byte state, String channelRespResult) {
 
         PayOrderDivisionRecord updateRecord = new PayOrderDivisionRecord();
         updateRecord.setState(state);
-        updateRecord.setChannelRespResult( state == PayOrderDivisionRecord.STATE_SUCCESS ? "" : channelRespResult); // 若明确成功，清空错误信息。
+        updateRecord.setChannelRespResult(state == PayOrderDivisionRecord.STATE_SUCCESS ? "" : channelRespResult); // 若明确成功，清空错误信息。
         update(updateRecord, PayOrderDivisionRecord.gw().eq(PayOrderDivisionRecord::getRecordId, recordId).eq(PayOrderDivisionRecord::getState, PayOrderDivisionRecord.STATE_ACCEPT));
 
     }
 
 
-    /** 更新分账记录为分账成功**/
-    public void updateRecordSuccessOrFail(List<PayOrderDivisionRecord> records, Byte state, String channelBatchOrderId, String channelRespResult){
+    /**
+     * 更新分账记录为分账成功
+     **/
+    public void updateRecordSuccessOrFail(List<PayOrderDivisionRecord> records, Byte state, String channelBatchOrderId, String channelRespResult) {
 
-        if(records == null || records.isEmpty()){
-            return ;
+        if (records == null || records.isEmpty()) {
+            return;
         }
 
         List<Long> recordIds = new ArrayList<>();
@@ -57,9 +62,11 @@ public class PayOrderDivisionRecordService extends ServiceImpl<PayOrderDivisionR
 
     }
 
-    /** 更新分账订单为： 等待分账中的状态  **/
+    /**
+     * 更新分账订单为： 等待分账中的状态
+     **/
     @Transactional
-    public void updateResendState(String payOrderId){
+    public void updateResendState(String payOrderId) {
 
         PayOrder updateRecord = new PayOrder();
         updateRecord.setDivisionState(PayOrder.DIVISION_STATE_WAIT_TASK);
@@ -67,8 +74,8 @@ public class PayOrderDivisionRecordService extends ServiceImpl<PayOrderDivisionR
         // 更新订单
         int payOrderUpdateRow = payOrderMapper.update(updateRecord, PayOrder.gw().eq(PayOrder::getPayOrderId, payOrderId).eq(PayOrder::getDivisionState, PayOrder.DIVISION_STATE_FINISH));
 
-        if(payOrderUpdateRow <= 0){
-             throw new BizException("更新订单分账状态失败");
+        if (payOrderUpdateRow <= 0) {
+            throw new BizException("更新订单分账状态失败");
         }
 
         PayOrderDivisionRecord updateRecordByDiv = new PayOrderDivisionRecord();
@@ -80,7 +87,7 @@ public class PayOrderDivisionRecordService extends ServiceImpl<PayOrderDivisionR
                 PayOrderDivisionRecord.gw().eq(PayOrderDivisionRecord::getPayOrderId, payOrderId).eq(PayOrderDivisionRecord::getState, PayOrderDivisionRecord.STATE_FAIL)
         );
 
-        if(!recordUpdateFlag){
+        if (!recordUpdateFlag) {
             throw new BizException("更新分账记录状态失败");
         }
     }

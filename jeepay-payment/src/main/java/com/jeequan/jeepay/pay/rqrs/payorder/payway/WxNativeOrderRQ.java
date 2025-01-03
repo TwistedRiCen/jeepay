@@ -29,7 +29,9 @@ import lombok.Data;
 @Data
 public class WxNativeOrderRQ extends CommonPayDataRQ {
 
-    /** 构造函数 **/
+    /**
+     * 构造函数
+     **/
     public WxNativeOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.WX_NATIVE);
     }

@@ -34,13 +34,13 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /*
-* 支付接口： 小新支付
-* 支付方式： 自适应
-*
-* @author jmdhappy
-* @site https://www.jeequan.com
-* @date 2021/9/20 20:00
-*/
+ * 支付接口： 小新支付
+ * 支付方式： 自适应
+ *
+ * @author jmdhappy
+ * @site https://www.jeequan.com
+ * @date 2021/9/20 20:00
+ */
 @Service
 @Slf4j
 public class XxpayPaymentService extends AbstractPaymentService {
@@ -67,6 +67,7 @@ public class XxpayPaymentService extends AbstractPaymentService {
 
     /**
      * 统一支付处理
+     *
      * @param payOrder
      * @param params
      * @param paramMap
@@ -78,7 +79,7 @@ public class XxpayPaymentService extends AbstractPaymentService {
         String sign = XxpayKit.getSign(paramMap, params.getKey());
         paramMap.put("sign", sign);
         // 支付下单地址
-        String payUrl = XxpayKit.getPaymentUrl(params.getPayUrl())+ "?" + JeepayKit.genUrlParams(paramMap);
+        String payUrl = XxpayKit.getPaymentUrl(params.getPayUrl()) + "?" + JeepayKit.genUrlParams(paramMap);
         String resStr = "";
         try {
             log.info("发起支付[{}]参数：{}", getIfCode(), payUrl);
@@ -88,15 +89,15 @@ public class XxpayPaymentService extends AbstractPaymentService {
             log.error("http error", e);
         }
 
-        if(StringUtils.isEmpty(resStr)) {
+        if (StringUtils.isEmpty(resStr)) {
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
             channelRetMsg.setChannelErrCode("");
-            channelRetMsg.setChannelErrMsg("请求"+getIfCode()+"接口异常");
+            channelRetMsg.setChannelErrMsg("请求" + getIfCode() + "接口异常");
             return null;
         }
 
         JSONObject resObj = JSONObject.parseObject(resStr);
-        if(!"0".equals(resObj.getString("retCode"))){
+        if (!"0".equals(resObj.getString("retCode"))) {
             String retMsg = resObj.getString("retMsg");
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
             channelRetMsg.setChannelErrCode("");
@@ -107,16 +108,16 @@ public class XxpayPaymentService extends AbstractPaymentService {
         // 验证响应数据签名
         String checkSign = resObj.getString("sign");
         resObj.remove("sign");
-        if(!checkSign.equals(XxpayKit.getSign(resObj, params.getKey()))) {
+        if (!checkSign.equals(XxpayKit.getSign(resObj, params.getKey()))) {
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
             return null;
         }
 
         // 订单状态-2:订单已关闭,0-订单生成,1-支付中,2-支付成功,3-业务处理完成,4-已退款
         String orderStatus = resObj.getString("orderStatus");
-        if("2".equals(orderStatus) || "3".equals(orderStatus)) {
+        if ("2".equals(orderStatus) || "3".equals(orderStatus)) {
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-        }else {
+        } else {
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
         }
         return resObj;

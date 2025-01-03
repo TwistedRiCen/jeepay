@@ -74,10 +74,10 @@ public class WxNative extends WxpayPaymentService {
             JSONObject resJSON = JSONObject.parseObject(payInfo);
 
             String codeUrl = resJSON.getString("code_url");
-            if (CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(bizRQ.getPayDataType())){ //二维码图片地址
+            if (CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(bizRQ.getPayDataType())) { //二维码图片地址
 
                 res.setCodeImgUrl(sysConfigService.getDBApplicationConfig().genScanImgUrl(codeUrl));
-            }else{
+            } else {
 
                 res.setCodeUrl(codeUrl);
             }

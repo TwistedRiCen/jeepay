@@ -18,21 +18,27 @@ package com.jeequan.jeepay.components.mq.model;
 import com.jeequan.jeepay.components.mq.constant.MQSendTypeEnum;
 
 /**
-* 定义MQ消息格式
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/7/22 15:33
-*/
+ * 定义MQ消息格式
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/7/22 15:33
+ */
 public abstract class AbstractMQ {
 
-    /** MQ名称 **/
+    /**
+     * MQ名称
+     **/
     public abstract String getMQName();
 
-    /** MQ 类型 **/
+    /**
+     * MQ 类型
+     **/
     public abstract MQSendTypeEnum getMQType();
 
-    /** 构造MQ消息体 String类型 **/
+    /**
+     * 构造MQ消息体 String类型
+     **/
     public abstract String toMessage();
 
 }

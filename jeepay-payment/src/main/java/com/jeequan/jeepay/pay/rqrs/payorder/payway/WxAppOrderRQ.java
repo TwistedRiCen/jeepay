@@ -31,18 +31,22 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class WxAppOrderRQ extends UnifiedOrderRQ {
 
-    /** 微信openid **/
+    /**
+     * 微信openid
+     **/
     @NotBlank(message = "openid不能为空")
     private String openid;
 
-    /** 构造函数 **/
-    public WxAppOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public WxAppOrderRQ() {
         this.setWayCode(CS.PAY_DATA_TYPE.WX_APP); //默认 wayCode, 避免validate出现问题
     }
 
 
     @Override
-    public String getChannelUserId(){
+    public String getChannelUserId() {
         return this.openid;
     }
 }

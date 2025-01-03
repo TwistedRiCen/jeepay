@@ -47,18 +47,18 @@ public class WxBar extends XxpayPaymentService {
     @Override
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
         WxBarOrderRQ bizRQ = (WxBarOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getAuthCode())){
+        if (StringUtils.isEmpty(bizRQ.getAuthCode())) {
             throw new BizException("用户支付条码[authCode]不可为空");
         }
         return null;
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext){
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
         WxBarOrderRQ bizRQ = (WxBarOrderRQ) rq;
-        XxpayNormalMchParams params = (XxpayNormalMchParams)configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+        XxpayNormalMchParams params = (XxpayNormalMchParams) configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
         // 构造支付请求参数
-        Map<String,Object> paramMap = new TreeMap();
+        Map<String, Object> paramMap = new TreeMap();
         paramMap.put("mchId", params.getMchId());
         paramMap.put("productId", "8020"); // 微信条码
         paramMap.put("mchOrderNo", payOrder.getPayOrderId());

@@ -24,8 +24,6 @@ import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
 import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
-import com.jeequan.jeepay.pay.rqrs.payorder.payway.AliJsapiOrderRQ;
-import com.jeequan.jeepay.pay.rqrs.payorder.payway.AliJsapiOrderRS;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxJsapiOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxJsapiOrderRS;
 import com.jeequan.jeepay.pay.util.ApiResBuilder;
@@ -49,19 +47,19 @@ public class WxJsapi extends XxpayPaymentService {
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
 
         WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getOpenid())){
+        if (StringUtils.isEmpty(bizRQ.getOpenid())) {
             throw new BizException("[openId]不可为空");
         }
         return null;
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception{
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception {
         WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ) rq;
 
-        XxpayNormalMchParams params = (XxpayNormalMchParams)configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+        XxpayNormalMchParams params = (XxpayNormalMchParams) configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
         // 构造支付请求参数
-        Map<String,Object> paramMap = new TreeMap();
+        Map<String, Object> paramMap = new TreeMap();
         paramMap.put("mchId", params.getMchId());
         paramMap.put("productId", "8004"); // 微信公众号支付
         paramMap.put("mchOrderNo", payOrder.getPayOrderId());
@@ -80,7 +78,7 @@ public class WxJsapi extends XxpayPaymentService {
         res.setChannelRetMsg(channelRetMsg);
         // 发起支付
         JSONObject resObj = doPay(payOrder, params, paramMap, channelRetMsg);
-        if(resObj == null) {
+        if (resObj == null) {
             return res;
         }
         res.setPayInfo(resObj.getString("payParams"));

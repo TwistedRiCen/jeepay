@@ -23,12 +23,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jeequan.jeepay.core.aop.MethodLog;
 import com.jeequan.jeepay.core.constants.ApiCodeEnum;
 import com.jeequan.jeepay.core.constants.CS;
-import com.jeequan.jeepay.core.entity.*;
+import com.jeequan.jeepay.core.entity.MchApp;
+import com.jeequan.jeepay.core.entity.MchInfo;
+import com.jeequan.jeepay.core.entity.MchPayPassage;
+import com.jeequan.jeepay.core.entity.PayWay;
 import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.core.model.ApiPageRes;
 import com.jeequan.jeepay.core.model.ApiRes;
 import com.jeequan.jeepay.mgr.ctrl.CommonCtrl;
-import com.jeequan.jeepay.service.impl.*;
+import com.jeequan.jeepay.service.impl.MchAppService;
+import com.jeequan.jeepay.service.impl.MchInfoService;
+import com.jeequan.jeepay.service.impl.MchPayPassageService;
+import com.jeequan.jeepay.service.impl.PayWayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -36,7 +42,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -53,17 +63,21 @@ import java.util.List;
 @RequestMapping("/api/mch/payPassages")
 public class MchPayPassageConfigController extends CommonCtrl {
 
-    @Autowired private MchPayPassageService mchPayPassageService;
-    @Autowired private PayWayService payWayService;
-    @Autowired private MchInfoService mchInfoService;
-    @Autowired private MchAppService mchAppService;
+    @Autowired
+    private MchPayPassageService mchPayPassageService;
+    @Autowired
+    private PayWayService payWayService;
+    @Autowired
+    private MchInfoService mchInfoService;
+    @Autowired
+    private MchAppService mchAppService;
 
 
     /**
      * @Author: ZhuXiao
      * @Description: 查询支付方式列表，并添加是否配置支付通道状态
      * @Date: 15:31 2021/5/10
-    */
+     */
     @ApiOperation("查询支付方式列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -119,11 +133,11 @@ public class MchPayPassageConfigController extends CommonCtrl {
     }
 
     /**
+     * @return
      * @Author: ZhuXiao
      * @Description: 根据appId、支付方式查询可用的支付接口列表
      * @Date: 17:55 2021/5/8
-     * @return
-    */
+     */
     @ApiOperation("根据[应用ID]、[支付方式代码]查询可用的支付接口列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -154,7 +168,7 @@ public class MchPayPassageConfigController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 应用支付通道配置
      * @Date: 17:36 2021/5/8
-    */
+     */
     @ApiOperation("更新商户支付通道")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -179,7 +193,7 @@ public class MchPayPassageConfigController extends CommonCtrl {
 
             mchPayPassageService.saveOrUpdateBatchSelf(mchPayPassageList, mchApp.getMchNo());
             return ApiRes.ok();
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ApiRes.fail(ApiCodeEnum.SYSTEM_ERROR);
         }
     }

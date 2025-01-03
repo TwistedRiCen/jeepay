@@ -31,17 +31,21 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UpJsapiOrderRQ extends UnifiedOrderRQ {
 
-    /** 支付宝用户ID **/
+    /**
+     * 支付宝用户ID
+     **/
     @NotBlank(message = "用户ID不能为空")
     private String userId;
 
-    /** 构造函数 **/
-    public UpJsapiOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public UpJsapiOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.UP_JSAPI);
     }
 
     @Override
-    public String getChannelUserId(){
+    public String getChannelUserId() {
         return this.userId;
     }
 

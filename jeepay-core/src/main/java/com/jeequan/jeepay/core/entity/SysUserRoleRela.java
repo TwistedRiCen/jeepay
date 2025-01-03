@@ -40,24 +40,22 @@ import java.io.Serializable;
 @TableName("t_sys_user_role_rela")
 public class SysUserRoleRela implements Serializable {
 
-    //gw
-    public static final LambdaQueryWrapper<SysUserRoleRela> gw(){
-        return new LambdaQueryWrapper<>();
-    }
-
-    private static final long serialVersionUID=1L;
-
+    private static final long serialVersionUID = 1L;
     /**
      * 用户ID
      */
     @ApiModelProperty(value = "用户ID")
     private Long userId;
-
     /**
      * 角色ID
      */
     @ApiModelProperty(value = "角色ID")
     private String roleId;
+
+    //gw
+    public static final LambdaQueryWrapper<SysUserRoleRela> gw() {
+        return new LambdaQueryWrapper<>();
+    }
 
 
 }

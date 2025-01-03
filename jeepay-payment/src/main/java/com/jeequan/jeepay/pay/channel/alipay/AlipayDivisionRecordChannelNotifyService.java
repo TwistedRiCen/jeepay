@@ -30,11 +30,12 @@ import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.rqrs.msg.DivisionChannelNotifyModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
 * 支付宝 分账回调接口实现类
@@ -87,19 +88,19 @@ public class AlipayDivisionRecordChannelNotifyService extends AbstractDivisionRe
             //配置参数获取
             Byte useCert = null;
             String alipaySignType, alipayPublicCert, alipayPublicKey = null;
-            if(mchAppConfigContext.isIsvsubMch()){
+            if (mchAppConfigContext.isIsvsubMch()) {
 
                 // 获取支付参数
-                AlipayIsvParams alipayParams = (AlipayIsvParams)configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
+                AlipayIsvParams alipayParams = (AlipayIsvParams) configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
                 useCert = alipayParams.getUseCert();
                 alipaySignType = alipayParams.getSignType();
                 alipayPublicCert = alipayParams.getAlipayPublicCert();
                 alipayPublicKey = alipayParams.getAlipayPublicKey();
 
-            }else{
+            } else {
 
                 // 获取支付参数
-                AlipayNormalMchParams alipayParams = (AlipayNormalMchParams)configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+                AlipayNormalMchParams alipayParams = (AlipayNormalMchParams) configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
 
                 useCert = alipayParams.getUseCert();
                 alipaySignType = alipayParams.getSignType();
@@ -111,17 +112,17 @@ public class AlipayDivisionRecordChannelNotifyService extends AbstractDivisionRe
             JSONObject jsonParams = (JSONObject) params;
 
             boolean verifyResult;
-            if(useCert != null && useCert == CS.YES){  //证书方式
+            if (useCert != null && useCert == CS.YES) {  //证书方式
 
                 verifyResult = AlipaySignature.rsaCertCheckV1(jsonParams.toJavaObject(Map.class), getCertFilePath(alipayPublicCert),
                         AlipayConfig.CHARSET, alipaySignType);
 
-            }else{
+            } else {
                 verifyResult = AlipaySignature.rsaCheckV1(jsonParams.toJavaObject(Map.class), alipayPublicKey, AlipayConfig.CHARSET, alipaySignType);
             }
 
             //验签失败
-            if(!verifyResult){
+            if (!verifyResult) {
                 throw ResponseException.buildText("ERROR");
             }
 
@@ -144,15 +145,15 @@ public class AlipayDivisionRecordChannelNotifyService extends AbstractDivisionRe
                 Long recordId = accnoAndRecordIdSet.get(itemJSON.getString("trans_in"));
 
                 // 分账类型 && 包含该笔分账账号
-                if("transfer".equals(itemJSON.getString("operation_type")) && recordId != null){
+                if ("transfer".equals(itemJSON.getString("operation_type")) && recordId != null) {
 
                     // 分账成功
-                    if("SUCCESS".equals(itemJSON.getString("state"))){
+                    if ("SUCCESS".equals(itemJSON.getString("state"))) {
                         recordResultMap.put(recordId, ChannelRetMsg.confirmSuccess(bizContentJSON.getString("settle_no")));
                     }
 
                     // 分账失败
-                    if("FAIL".equals(itemJSON.getString("state"))){
+                    if ("FAIL".equals(itemJSON.getString("state"))) {
                         recordResultMap.put(recordId, ChannelRetMsg.confirmFail(bizContentJSON.getString("settle_no"), itemJSON.getString("error_code"), itemJSON.getString("error_desc")));
                     }
                 }

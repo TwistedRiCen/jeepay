@@ -30,7 +30,9 @@ import lombok.Data;
 @Data
 public class ClosePayOrderRS extends AbstractRS {
 
-    /** 上游渠道返回数据包 (无需JSON序列化) **/
+    /**
+     * 上游渠道返回数据包 (无需JSON序列化)
+     **/
     @JSONField(serialize = false)
     private ChannelRetMsg channelRetMsg;
 

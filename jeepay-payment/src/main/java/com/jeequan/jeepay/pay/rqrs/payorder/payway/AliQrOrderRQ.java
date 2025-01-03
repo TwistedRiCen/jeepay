@@ -29,8 +29,10 @@ import lombok.Data;
 @Data
 public class AliQrOrderRQ extends CommonPayDataRQ {
 
-    /** 构造函数 **/
-    public AliQrOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public AliQrOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.ALI_QR);
     }
 

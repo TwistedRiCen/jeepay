@@ -29,16 +29,18 @@ import lombok.Data;
 @Data
 public class WxJsapiOrderRS extends UnifiedOrderRS {
 
-    /** 预支付数据包 **/
+    /**
+     * 预支付数据包
+     **/
     private String payInfo;
 
     @Override
-    public String buildPayDataType(){
+    public String buildPayDataType() {
         return CS.PAY_DATA_TYPE.WX_APP;
     }
 
     @Override
-    public String buildPayData(){
+    public String buildPayData() {
         return payInfo;
     }
 

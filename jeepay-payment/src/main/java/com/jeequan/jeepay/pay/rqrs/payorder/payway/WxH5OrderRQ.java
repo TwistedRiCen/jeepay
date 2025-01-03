@@ -14,7 +14,9 @@ import lombok.Data;
 @Data
 public class WxH5OrderRQ extends CommonPayDataRQ {
 
-    /** 构造函数 **/
+    /**
+     * 构造函数
+     **/
     public WxH5OrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.WX_H5);
     }

@@ -22,19 +22,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /*
-* 订单过期定时任务
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:47
-*/
+ * 订单过期定时任务
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:47
+ */
 @Slf4j
 @Component
 public class PayOrderExpiredTask {
 
-    @Autowired private PayOrderService payOrderService;
+    @Autowired
+    private PayOrderService payOrderService;
 
-    @Scheduled(cron="0 0/1 * * * ?") // 每分钟执行一次
+    @Scheduled(cron = "0 0/1 * * * ?") // 每分钟执行一次
     public void start() {
 
         int updateCount = payOrderService.updateOrderExpired();

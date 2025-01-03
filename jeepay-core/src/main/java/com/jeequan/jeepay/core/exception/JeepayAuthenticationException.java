@@ -40,11 +40,11 @@ public class JeepayAuthenticationException extends InternalAuthenticationService
         super(msg);
     }
 
-    public static JeepayAuthenticationException build(String msg){
+    public static JeepayAuthenticationException build(String msg) {
         return build(new BizException(msg));
     }
 
-    public static JeepayAuthenticationException build(BizException ex){
+    public static JeepayAuthenticationException build(BizException ex) {
 
         JeepayAuthenticationException result = new JeepayAuthenticationException(ex.getMessage());
         result.setBizException(ex);

@@ -33,7 +33,13 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 商户应用管理类
@@ -48,15 +54,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/mchApps")
 public class MchAppController extends CommonCtrl {
 
-    @Autowired private MchInfoService mchInfoService;
-    @Autowired private MchAppService mchAppService;
-    @Autowired private IMQSender mqSender;
+    @Autowired
+    private MchInfoService mchInfoService;
+    @Autowired
+    private MchAppService mchAppService;
+    @Autowired
+    private IMQSender mqSender;
 
     /**
      * @Author: ZhuXiao
      * @Description: 应用列表
      * @Date: 9:59 2021/6/16
-    */
+     */
     @ApiOperation("查询应用列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -80,7 +89,7 @@ public class MchAppController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 新建应用
      * @Date: 10:05 2021/6/16
-    */
+     */
     @ApiOperation("新建应用")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -97,7 +106,7 @@ public class MchAppController extends CommonCtrl {
         MchApp mchApp = getObject(MchApp.class);
         mchApp.setAppId(IdUtil.objectId());
 
-        if(mchInfoService.getById(mchApp.getMchNo()) == null) {
+        if (mchInfoService.getById(mchApp.getMchNo()) == null) {
             return ApiRes.fail(ApiCodeEnum.SYS_OPERATION_FAIL_SELETE);
         }
 
@@ -133,7 +142,7 @@ public class MchAppController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 更新应用信息
      * @Date: 10:11 2021/6/16
-    */
+     */
     @ApiOperation("更新应用信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),

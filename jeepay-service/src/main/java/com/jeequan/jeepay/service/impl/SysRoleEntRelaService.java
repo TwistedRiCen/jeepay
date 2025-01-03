@@ -38,13 +38,16 @@ import java.util.List;
 @Service
 public class SysRoleEntRelaService extends ServiceImpl<SysRoleEntRelaMapper, SysRoleEntRela> {
 
-    @Autowired private SysEntitlementService sysEntitlementService;
+    @Autowired
+    private SysEntitlementService sysEntitlementService;
 
-    /** 根据人查询出所有权限ID集合  */
-    public List<String> selectEntIdsByUserId(Long userId, Byte isAdmin, String sysType){
+    /**
+     * 根据人查询出所有权限ID集合
+     */
+    public List<String> selectEntIdsByUserId(Long userId, Byte isAdmin, String sysType) {
 
 
-        if(isAdmin == CS.YES){
+        if (isAdmin == CS.YES) {
 
             List<String> result = new ArrayList<>();
             sysEntitlementService.list(SysEntitlement.gw().select(SysEntitlement::getEntId).eq(SysEntitlement::getSysType, sysType).eq(SysEntitlement::getState, CS.PUB_USABLE)
@@ -52,16 +55,18 @@ public class SysRoleEntRelaService extends ServiceImpl<SysRoleEntRelaMapper, Sys
 
             return result;
 
-        }else{
+        } else {
             return baseMapper.selectEntIdsByUserId(userId, sysType);
         }
 
     }
 
 
-    /** 重置 角色 - 权限 关联关系 **/
+    /**
+     * 重置 角色 - 权限 关联关系
+     **/
     @Transactional
-    public void resetRela(String roleId, List<String> entIdList){
+    public void resetRela(String roleId, List<String> entIdList) {
 
         //1. 删除
         this.remove(SysRoleEntRela.gw().eq(SysRoleEntRela::getRoleId, roleId));
@@ -69,14 +74,12 @@ public class SysRoleEntRelaService extends ServiceImpl<SysRoleEntRelaMapper, Sys
         //2. 插入
         for (String entId : entIdList) {
             SysRoleEntRela r = new SysRoleEntRela();
-            r.setRoleId(roleId); r.setEntId(entId);
+            r.setRoleId(roleId);
+            r.setEntId(entId);
             this.save(r);
         }
 
     }
-
-
-
 
 
 }

@@ -21,13 +21,13 @@ import com.jeequan.jeepay.core.entity.PayOrder;
 import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.core.model.params.wxpay.WxpayIsvParams;
 import com.jeequan.jeepay.pay.channel.ysfpay.YsfpayPaymentService;
+import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
+import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxJsapiOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxJsapiOrderRS;
-import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.util.ApiResBuilder;
-import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +45,7 @@ public class WxJsapi extends YsfpayPaymentService {
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
 
         WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getOpenid())){
+        if (StringUtils.isEmpty(bizRQ.getOpenid())) {
             throw new BizException("[openId]不可为空");
         }
         return null;
@@ -70,7 +70,7 @@ public class WxJsapi extends YsfpayPaymentService {
         reqParams.put("customerIp", StringUtils.defaultIfEmpty(payOrder.getClientIp(), "127.0.0.1"));
 
         // 获取微信官方配置 的appId
-        WxpayIsvParams wxpayIsvParams = (WxpayIsvParams)configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), CS.IF_CODE.WXPAY);
+        WxpayIsvParams wxpayIsvParams = (WxpayIsvParams) configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), CS.IF_CODE.WXPAY);
         reqParams.put("subAppId", wxpayIsvParams.getAppId()); //用户ID
 
         // 发送请求并返回订单状态
@@ -81,16 +81,16 @@ public class WxJsapi extends YsfpayPaymentService {
 
         try {
             //00-交易成功， 02-用户支付中 , 12-交易重复， 需要发起查询处理    其他认为失败
-            if("00".equals(respCode)){
+            if ("00".equals(respCode)) {
                 //付款信息
                 res.setPayInfo(resJSON.getString("payData"));
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
-            }else{
+            } else {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
                 channelRetMsg.setChannelErrCode(respCode);
                 channelRetMsg.setChannelErrMsg(respMsg);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             channelRetMsg.setChannelErrCode(respCode);
             channelRetMsg.setChannelErrMsg(respMsg);
         }

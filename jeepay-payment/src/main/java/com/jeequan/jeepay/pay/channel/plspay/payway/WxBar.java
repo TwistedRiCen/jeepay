@@ -83,14 +83,14 @@ public class WxBar extends PlspayPaymentService {
                 if (PlspayConfig.PAY_STATE_SUCCESS.equals(response.getData().getString("orderState"))) {
                     // 支付成功
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-                }else {
+                } else {
                     // 支付中
                     channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
                 }
                 channelRetMsg.setChannelOrderId(response.get().getPayOrderId());
             } else {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
-                channelRetMsg.setChannelErrCode(response.getCode()+"");
+                channelRetMsg.setChannelErrCode(response.getCode() + "");
                 channelRetMsg.setChannelErrMsg(response.getMsg());
             }
         } catch (JeepayException e) {

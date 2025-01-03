@@ -51,19 +51,21 @@ import java.math.BigDecimal;
 import java.security.PrivateKey;
 
 /*
-* 微信回调
-*
-* @author zhuxiao
-* @site https://www.jeequan.com
-* @date 2021/6/8 18:10
-*/
+ * 微信回调
+ *
+ * @author zhuxiao
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 18:10
+ */
 @Service
 @Slf4j
 public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
 
-    @Autowired private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
 
-    @Autowired private PayOrderService payOrderService;
+    @Autowired
+    private PayOrderService payOrderService;
 
     @Override
     public String getIfCode() {
@@ -74,17 +76,17 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
     public MutablePair<String, Object> parseParams(HttpServletRequest request, String urlOrderId, NoticeTypeEnum noticeTypeEnum) {
 
         try {
-            if(StringUtils.isNotBlank(urlOrderId)){     // V3接口回调
+            if (StringUtils.isNotBlank(urlOrderId)) {     // V3接口回调
 
                 // 获取订单信息
                 PayOrder payOrder = payOrderService.getById(urlOrderId);
-                if(payOrder == null){
+                if (payOrder == null) {
                     throw new BizException("订单不存在");
                 }
 
                 //获取支付参数 (缓存数据) 和 商户信息
                 MchAppConfigContext mchAppConfigContext = configContextQueryService.queryMchInfoAndAppInfo(payOrder.getMchNo(), payOrder.getAppId());
-                if(mchAppConfigContext == null){
+                if (mchAppConfigContext == null) {
                     throw new BizException("获取商户信息失败");
                 }
 
@@ -95,7 +97,7 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
 
             } else {     // V2接口回调
                 String xmlResult = IOUtils.toString(request.getInputStream(), request.getCharacterEncoding());
-                if(StringUtils.isEmpty(xmlResult)) {
+                if (StringUtils.isEmpty(xmlResult)) {
                     return null;
                 }
 
@@ -131,7 +133,7 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
                 channelResult.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
                 channelResult.setResponseEntity(textResp(WxPayNotifyResponse.successResp("OK")));
 
-            }else if (CS.PAY_IF_VERSION.WX_V3.equals(wxServiceWrapper.getApiVersion())) { // V3
+            } else if (CS.PAY_IF_VERSION.WX_V3.equals(wxServiceWrapper.getApiVersion())) { // V3
                 // 获取回调参数
                 WxPayNotifyV3Result.DecryptNotifyResult result = (WxPayNotifyV3Result.DecryptNotifyResult) params;
 
@@ -141,9 +143,9 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
                 String channelState = result.getTradeState();
                 if ("SUCCESS".equals(channelState)) {
                     channelResult.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-                }else if("CLOSED".equals(channelState)
+                } else if ("CLOSED".equals(channelState)
                         || "REVOKED".equals(channelState)
-                        || "PAYERROR".equals(channelState)){  //CLOSED—已关闭， REVOKED—已撤销, PAYERROR--支付失败
+                        || "PAYERROR".equals(channelState)) {  //CLOSED—已关闭， REVOKED—已撤销, PAYERROR--支付失败
                     channelResult.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL); //支付失败
                 }
 
@@ -160,7 +162,7 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
                 ResponseEntity okResponse = jsonResp(resJSON);
                 channelResult.setResponseEntity(okResponse); //响应数据
 
-            }else {
+            } else {
                 throw ResponseException.buildText("API_VERSION ERROR");
             }
 
@@ -174,6 +176,7 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
 
     /**
      * V2接口验证微信支付通知参数
+     *
      * @return
      */
     public void verifyWxPayParams(WxPayService wxPayService, WxPayOrderNotifyResult result, PayOrder payOrder) {
@@ -182,7 +185,7 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
             result.checkResult(wxPayService, WxPayConstants.SignType.MD5, true);
 
             // 核对金额
-            Integer total_fee = result.getTotalFee();   			// 总金额
+            Integer total_fee = result.getTotalFee();            // 总金额
             long wxPayAmt = new BigDecimal(total_fee).longValue();
             long dbPayAmt = payOrder.getAmount().longValue();
             if (dbPayAmt != wxPayAmt) {
@@ -195,7 +198,8 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
 
     /**
      * V3校验通知签名
-     * @param request 请求信息
+     *
+     * @param request             请求信息
      * @param mchAppConfigContext 商户配置
      * @return true:校验通过 false:校验不通过
      */
@@ -228,13 +232,14 @@ public class WxpayChannelNoticeService extends AbstractChannelNoticeService {
 
     /**
      * V3接口验证微信支付通知参数
+     *
      * @return
      */
     public void verifyWxPayParams(WxPayNotifyV3Result.DecryptNotifyResult result, PayOrder payOrder) {
 
         try {
             // 核对金额
-            Integer total_fee = result.getAmount().getTotal();   			// 总金额
+            Integer total_fee = result.getAmount().getTotal();            // 总金额
             long wxPayAmt = new BigDecimal(total_fee).longValue();
             long dbPayAmt = payOrder.getAmount().longValue();
             if (dbPayAmt != wxPayAmt) {

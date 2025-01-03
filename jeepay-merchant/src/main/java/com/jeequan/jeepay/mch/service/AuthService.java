@@ -44,7 +44,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 认证Service
@@ -60,17 +64,23 @@ public class AuthService {
     @Resource
     private AuthenticationManager authenticationManager;
 
-    @Autowired private SysUserService sysUserService;
-    @Autowired private SysRoleService sysRoleService;
-    @Autowired private SysRoleEntRelaService sysRoleEntRelaService;
-    @Autowired private MchInfoService mchInfoService;
-    @Autowired private SysEntitlementMapper sysEntitlementMapper;
-    @Autowired private SystemYmlConfig systemYmlConfig;
+    @Autowired
+    private SysUserService sysUserService;
+    @Autowired
+    private SysRoleService sysRoleService;
+    @Autowired
+    private SysRoleEntRelaService sysRoleEntRelaService;
+    @Autowired
+    private MchInfoService mchInfoService;
+    @Autowired
+    private SysEntitlementMapper sysEntitlementMapper;
+    @Autowired
+    private SystemYmlConfig systemYmlConfig;
 
     /**
      * 认证
-     * **/
-    public String auth(String username, String password){
+     **/
+    public String auth(String username, String password) {
 
         //1. 生成spring-security usernamePassword类型对象
         UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(username, password);
@@ -97,7 +107,7 @@ public class AuthService {
         SysUser sysUser = jeeUserDetails.getSysUser();
 
         //非超级管理员 && 不包含左侧菜单 进行错误提示
-        if(sysUser.getIsAdmin() != CS.YES && sysEntitlementMapper.userHasLeftMenu(sysUser.getSysUserId(), CS.SYS_TYPE.MCH) <= 0){
+        if (sysUser.getIsAdmin() != CS.YES && sysEntitlementMapper.userHasLeftMenu(sysUser.getSysUserId(), CS.SYS_TYPE.MCH) <= 0) {
             throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
         }
 
@@ -126,11 +136,13 @@ public class AuthService {
         return JWTUtils.generateToken(new JWTPayload(jeeUserDetails), systemYmlConfig.getJwtSecret());
     }
 
-    /** 根据用户ID 更新缓存中的权限集合， 使得分配实时生效  **/
-    public void refAuthentication(List<Long> sysUserIdList){
+    /**
+     * 根据用户ID 更新缓存中的权限集合， 使得分配实时生效
+     **/
+    public void refAuthentication(List<Long> sysUserIdList) {
 
-        if(sysUserIdList == null || sysUserIdList.isEmpty()){
-            return ;
+        if (sysUserIdList == null || sysUserIdList.isEmpty()) {
+            return;
         }
 
         Map<Long, SysUser> sysUserMap = new HashMap<>();
@@ -145,20 +157,20 @@ public class AuthService {
         for (Long sysUserId : sysUserIdList) {
 
             Collection<String> cacheKeyList = RedisUtil.keys(CS.getCacheKeyToken(sysUserId, "*"));
-            if(cacheKeyList == null || cacheKeyList.isEmpty()){
+            if (cacheKeyList == null || cacheKeyList.isEmpty()) {
                 continue;
             }
 
             for (String cacheKey : cacheKeyList) {
 
                 //用户不存在 || 已禁用 需要删除Redis
-                if(sysUserMap.get(sysUserId) == null || sysUserMap.get(sysUserId).getState() == CS.PUB_DISABLE){
+                if (sysUserMap.get(sysUserId) == null || sysUserMap.get(sysUserId).getState() == CS.PUB_DISABLE) {
                     RedisUtil.del(cacheKey);
                     continue;
                 }
 
                 JeeUserDetails jwtBaseUser = RedisUtil.getObject(cacheKey, JeeUserDetails.class);
-                if(jwtBaseUser == null){
+                if (jwtBaseUser == null) {
                     continue;
                 }
 
@@ -175,14 +187,16 @@ public class AuthService {
 
     }
 
-    /** 根据用户ID 删除用户缓存信息  **/
-    public void delAuthentication(List<Long> sysUserIdList){
-        if(sysUserIdList == null || sysUserIdList.isEmpty()){
-            return ;
+    /**
+     * 根据用户ID 删除用户缓存信息
+     **/
+    public void delAuthentication(List<Long> sysUserIdList) {
+        if (sysUserIdList == null || sysUserIdList.isEmpty()) {
+            return;
         }
         for (Long sysUserId : sysUserIdList) {
             Collection<String> cacheKeyList = RedisUtil.keys(CS.getCacheKeyToken(sysUserId, "*"));
-            if(cacheKeyList == null || cacheKeyList.isEmpty()){
+            if (cacheKeyList == null || cacheKeyList.isEmpty()) {
                 continue;
             }
             for (String cacheKey : cacheKeyList) {
@@ -191,7 +205,7 @@ public class AuthService {
         }
     }
 
-    public List<SimpleGrantedAuthority> getUserAuthority(SysUser sysUser){
+    public List<SimpleGrantedAuthority> getUserAuthority(SysUser sysUser) {
 
         //用户拥有的角色集合  需要以ROLE_ 开头,  用户拥有的权限集合
         List<String> roleList = sysRoleService.findListByUser(sysUser.getSysUserId());

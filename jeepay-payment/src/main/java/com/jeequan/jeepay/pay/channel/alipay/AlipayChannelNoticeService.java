@@ -35,12 +35,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /*
-* 支付宝 回调接口实现类
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:20
-*/
+ * 支付宝 回调接口实现类
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:20
+ */
 @Service
 @Slf4j
 public class AlipayChannelNoticeService extends AbstractChannelNoticeService {
@@ -67,7 +67,6 @@ public class AlipayChannelNoticeService extends AbstractChannelNoticeService {
     }
 
 
-
     @Override
     public ChannelRetMsg doNotice(HttpServletRequest request, Object params, PayOrder payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum) {
         try {
@@ -75,19 +74,19 @@ public class AlipayChannelNoticeService extends AbstractChannelNoticeService {
             //配置参数获取
             Byte useCert = null;
             String alipaySignType, alipayPublicCert, alipayPublicKey = null;
-            if(mchAppConfigContext.isIsvsubMch()){
+            if (mchAppConfigContext.isIsvsubMch()) {
 
                 // 获取支付参数
-                AlipayIsvParams alipayParams = (AlipayIsvParams)configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
+                AlipayIsvParams alipayParams = (AlipayIsvParams) configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
                 useCert = alipayParams.getUseCert();
                 alipaySignType = alipayParams.getSignType();
                 alipayPublicCert = alipayParams.getAlipayPublicCert();
                 alipayPublicKey = alipayParams.getAlipayPublicKey();
 
-            }else{
+            } else {
 
                 // 获取支付参数
-                AlipayNormalMchParams alipayParams = (AlipayNormalMchParams)configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+                AlipayNormalMchParams alipayParams = (AlipayNormalMchParams) configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
 
                 useCert = alipayParams.getUseCert();
                 alipaySignType = alipayParams.getSignType();
@@ -99,17 +98,17 @@ public class AlipayChannelNoticeService extends AbstractChannelNoticeService {
             JSONObject jsonParams = (JSONObject) params;
 
             boolean verifyResult;
-            if(useCert != null && useCert == CS.YES){  //证书方式
+            if (useCert != null && useCert == CS.YES) {  //证书方式
 
                 verifyResult = AlipaySignature.rsaCertCheckV1(jsonParams.toJavaObject(Map.class), getCertFilePath(alipayPublicCert),
                         AlipayConfig.CHARSET, alipaySignType);
 
-            }else{
+            } else {
                 verifyResult = AlipaySignature.rsaCheckV1(jsonParams.toJavaObject(Map.class), alipayPublicKey, AlipayConfig.CHARSET, alipaySignType);
             }
 
             //验签失败
-            if(!verifyResult){
+            if (!verifyResult) {
                 throw ResponseException.buildText("ERROR");
             }
 
@@ -123,10 +122,10 @@ public class AlipayChannelNoticeService extends AbstractChannelNoticeService {
 
             result.setChannelState(ChannelRetMsg.ChannelState.WAITING); // 默认支付中
 
-            if("TRADE_SUCCESS".equals(jsonParams.getString("trade_status"))){
+            if ("TRADE_SUCCESS".equals(jsonParams.getString("trade_status"))) {
                 result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
 
-            }else if("TRADE_CLOSED".equals(jsonParams.getString("trade_status"))){
+            } else if ("TRADE_CLOSED".equals(jsonParams.getString("trade_status"))) {
                 result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
 
             }

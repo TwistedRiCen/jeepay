@@ -30,22 +30,24 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /*
-* 转账补单定时任务
-*
-* @author zx
-* @site https://www.jeequan.com
-* @date 2022/12/29 17:47
-*/
+ * 转账补单定时任务
+ *
+ * @author zx
+ * @site https://www.jeequan.com
+ * @date 2022/12/29 17:47
+ */
 @Slf4j
 @Component
 public class TransferOrderReissueTask {
 
     private static final int QUERY_PAGE_SIZE = 100; //每次查询数量
 
-    @Autowired private TransferOrderService transferOrderService;
-    @Autowired private TransferOrderReissueService transferOrderReissueService;
+    @Autowired
+    private TransferOrderService transferOrderService;
+    @Autowired
+    private TransferOrderReissueService transferOrderReissueService;
 
-    @Scheduled(cron="0 0/1 * * * ?") // 每分钟执行一次
+    @Scheduled(cron = "0 0/1 * * * ?") // 每分钟执行一次
     public void start() {
 
         //查询条件：
@@ -54,21 +56,21 @@ public class TransferOrderReissueTask {
                 .ge(TransferOrder::getCreatedAt, DateUtil.offsetDay(new Date(), -1)); // 只查询一天内的转账单;
 
         int currentPageIndex = 1; //当前页码
-        while(true){
+        while (true) {
 
             try {
                 IPage<TransferOrder> iPage = transferOrderService.page(new Page(currentPageIndex, QUERY_PAGE_SIZE), lambdaQueryWrapper);
 
-                if(iPage == null || iPage.getRecords().isEmpty()){ //本次查询无结果, 不再继续查询;
+                if (iPage == null || iPage.getRecords().isEmpty()) { //本次查询无结果, 不再继续查询;
                     break;
                 }
 
-                for(TransferOrder transferOrder: iPage.getRecords()){
+                for (TransferOrder transferOrder : iPage.getRecords()) {
                     transferOrderReissueService.processOrder(transferOrder);
                 }
 
                 //已经到达页码最大量，无需再次查询
-                if(iPage.getPages() <= currentPageIndex){
+                if (iPage.getPages() <= currentPageIndex) {
                     break;
                 }
                 currentPageIndex++;
@@ -79,7 +81,6 @@ public class TransferOrderReissueTask {
             }
         }
     }
-
 
 
 }

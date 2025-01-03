@@ -26,6 +26,6 @@ import lombok.Data;
  * @date 2021/6/8 17:34
  */
 @Data
-public class WxH5OrderRS  extends CommonPayDataRS {
+public class WxH5OrderRS extends CommonPayDataRS {
 
 }

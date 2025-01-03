@@ -28,10 +28,14 @@ import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
  */
 public interface IPayOrderCloseService {
 
-    /** 获取到接口code **/
+    /**
+     * 获取到接口code
+     **/
     String getIfCode();
 
-    /** 查询订单 **/
+    /**
+     * 查询订单
+     **/
     ChannelRetMsg close(PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception;
 
 }

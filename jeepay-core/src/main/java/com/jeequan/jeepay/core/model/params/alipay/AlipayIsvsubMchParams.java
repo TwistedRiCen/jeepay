@@ -26,7 +26,7 @@ import lombok.Data;
  * @date 2021/6/8 16:33
  */
 @Data
-public class AlipayIsvsubMchParams  extends IsvsubMchParams {
+public class AlipayIsvsubMchParams extends IsvsubMchParams {
 
     private String appAuthToken;
 

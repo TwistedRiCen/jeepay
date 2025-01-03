@@ -44,13 +44,14 @@ import java.util.Map;
 @Service
 public class MchPayPassageService extends ServiceImpl<MchPayPassageMapper, MchPayPassage> {
 
-    @Autowired private PayInterfaceDefineService payInterfaceDefineService;
+    @Autowired
+    private PayInterfaceDefineService payInterfaceDefineService;
 
     /**
      * @Author: ZhuXiao
      * @Description: 根据支付方式查询可用的支付接口列表
      * @Date: 9:56 2021/5/10
-    */
+     */
     public List<JSONObject> selectAvailablePayInterfaceList(String wayCode, String appId, Byte infoType, Byte mchType) {
         Map params = new HashMap();
         params.put("wayCode", wayCode);
@@ -76,7 +77,7 @@ public class MchPayPassageService extends ServiceImpl<MchPayPassageMapper, MchPa
                 }
                 object.put("state", payPassage.getState());
             }
-            if(object.getBigDecimal("ifRate") != null) {
+            if (object.getBigDecimal("ifRate") != null) {
                 object.put("ifRate", object.getBigDecimal("ifRate").multiply(new BigDecimal("100")));
             }
         }
@@ -102,23 +103,25 @@ public class MchPayPassageService extends ServiceImpl<MchPayPassageMapper, MchPa
     }
 
 
-    /** 根据应用ID 和 支付方式， 查询出商户可用的支付接口 **/
-    public MchPayPassage findMchPayPassage(String mchNo, String appId, String wayCode){
+    /**
+     * 根据应用ID 和 支付方式， 查询出商户可用的支付接口
+     **/
+    public MchPayPassage findMchPayPassage(String mchNo, String appId, String wayCode) {
 
         List<MchPayPassage> list = list(MchPayPassage.gw()
-                                    .eq(MchPayPassage::getMchNo, mchNo)
-                                    .eq(MchPayPassage::getAppId, appId)
-                                    .eq(MchPayPassage::getState, CS.YES)
-                                    .eq(MchPayPassage::getWayCode, wayCode)
+                .eq(MchPayPassage::getMchNo, mchNo)
+                .eq(MchPayPassage::getAppId, appId)
+                .eq(MchPayPassage::getState, CS.YES)
+                .eq(MchPayPassage::getWayCode, wayCode)
         );
 
         if (list.isEmpty()) {
             return null;
-        }else { // 返回一个可用通道
+        } else { // 返回一个可用通道
 
             HashMap<String, MchPayPassage> mchPayPassageMap = new HashMap<>();
 
-            for (MchPayPassage mchPayPassage:list) {
+            for (MchPayPassage mchPayPassage : list) {
                 mchPayPassageMap.put(mchPayPassage.getIfCode(), mchPayPassage);
             }
             // 查询ifCode所有接口

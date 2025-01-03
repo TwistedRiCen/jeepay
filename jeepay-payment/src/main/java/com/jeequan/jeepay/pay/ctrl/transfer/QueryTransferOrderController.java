@@ -30,34 +30,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
-* 商户转账单查询controller
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/8/13 15:20
-*/
+ * 商户转账单查询controller
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/8/13 15:20
+ */
 @Slf4j
 @RestController
 public class QueryTransferOrderController extends ApiController {
 
-    @Autowired private TransferOrderService transferOrderService;
-    @Autowired private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private TransferOrderService transferOrderService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
 
     /**
      * 查单接口
-     * **/
+     **/
     @RequestMapping("/api/transfer/query")
-    public ApiRes queryTransferOrder(){
+    public ApiRes queryTransferOrder() {
 
         //获取参数 & 验签
         QueryTransferOrderRQ rq = getRQByWithMchSign(QueryTransferOrderRQ.class);
 
-        if(StringUtils.isAllEmpty(rq.getMchOrderNo(), rq.getTransferId())){
+        if (StringUtils.isAllEmpty(rq.getMchOrderNo(), rq.getTransferId())) {
             throw new BizException("mchOrderNo 和 transferId不能同时为空");
         }
 
         TransferOrder refundOrder = transferOrderService.queryMchOrder(rq.getMchNo(), rq.getMchOrderNo(), rq.getTransferId());
-        if(refundOrder == null){
+        if (refundOrder == null) {
             throw new BizException("订单不存在");
         }
 

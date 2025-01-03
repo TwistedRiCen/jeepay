@@ -23,19 +23,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /*
-* 退款订单过期定时任务
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/17 14:36
-*/
+ * 退款订单过期定时任务
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/17 14:36
+ */
 @Slf4j
 @Component
 public class RefundOrderExpiredTask {
 
-    @Autowired private RefundOrderService refundOrderService;
+    @Autowired
+    private RefundOrderService refundOrderService;
 
-    @Scheduled(cron="0 0/1 * * * ?") // 每分钟执行一次
+    @Scheduled(cron = "0 0/1 * * * ?") // 每分钟执行一次
     public void start() {
 
         int updateCount = refundOrderService.updateOrderExpired();

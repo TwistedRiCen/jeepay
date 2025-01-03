@@ -44,8 +44,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CloseOrderController extends ApiController {
 
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
 
     /**
      * @author: xiaoyu
@@ -53,17 +55,17 @@ public class CloseOrderController extends ApiController {
      * @describe: 关闭订单
      */
     @RequestMapping("/api/pay/close")
-    public ApiRes closeOrder(){
+    public ApiRes closeOrder() {
 
         //获取参数 & 验签
         ClosePayOrderRQ rq = getRQByWithMchSign(ClosePayOrderRQ.class);
 
-        if(StringUtils.isAllEmpty(rq.getMchOrderNo(), rq.getPayOrderId())){
+        if (StringUtils.isAllEmpty(rq.getMchOrderNo(), rq.getPayOrderId())) {
             throw new BizException("mchOrderNo 和 payOrderId 不能同时为空");
         }
 
         PayOrder payOrder = payOrderService.queryMchOrder(rq.getMchNo(), rq.getPayOrderId(), rq.getMchOrderNo());
-        if(payOrder == null){
+        if (payOrder == null) {
             throw new BizException("订单不存在");
         }
 
@@ -88,7 +90,7 @@ public class CloseOrderController extends ApiController {
             IPayOrderCloseService closeService = SpringBeansUtil.getBean(payOrder.getIfCode() + "PayOrderCloseService", IPayOrderCloseService.class);
 
             // 支付通道接口实现不存在
-            if(closeService == null){
+            if (closeService == null) {
                 log.error("{} interface not exists!", payOrder.getIfCode());
                 return null;
             }
@@ -97,7 +99,7 @@ public class CloseOrderController extends ApiController {
             MchAppConfigContext mchAppConfigContext = configContextQueryService.queryMchInfoAndAppInfo(payOrder.getMchNo(), payOrder.getAppId());
 
             ChannelRetMsg channelRetMsg = closeService.close(payOrder, mchAppConfigContext);
-            if(channelRetMsg == null){
+            if (channelRetMsg == null) {
                 log.error("channelRetMsg is null");
                 return null;
             }
@@ -105,9 +107,9 @@ public class CloseOrderController extends ApiController {
             log.info("关闭订单[{}]结果为：{}", payOrderId, channelRetMsg);
 
             // 关闭订单 成功
-            if(channelRetMsg.getChannelState() == ChannelRetMsg.ChannelState.CONFIRM_SUCCESS) {
+            if (channelRetMsg.getChannelState() == ChannelRetMsg.ChannelState.CONFIRM_SUCCESS) {
                 payOrderService.updateIng2Close(payOrderId);
-            }else {
+            } else {
                 return ApiRes.customFail(channelRetMsg.getChannelErrMsg());
             }
 

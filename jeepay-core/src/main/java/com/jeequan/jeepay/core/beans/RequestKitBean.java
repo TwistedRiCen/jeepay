@@ -26,40 +26,40 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /*
-* 基于spring的 req 工具类
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/7 12:16
-*/
+ * 基于spring的 req 工具类
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/7 12:16
+ */
 @Slf4j
 @Component
 public class RequestKitBean {
 
+    /**
+     * reqContext对象中的key: 转换好的json对象
+     */
+    private static final String REQ_CONTEXT_KEY_PARAMJSON = "REQ_CONTEXT_KEY_PARAMJSON";
     @Autowired(required = false)
     protected HttpServletRequest request;   //自动注入request
 
-    /** reqContext对象中的key: 转换好的json对象 */
-    private static final String REQ_CONTEXT_KEY_PARAMJSON = "REQ_CONTEXT_KEY_PARAMJSON";
-
-    /** JSON 格式通过请求主体（BODY）传输  获取参数 **/
+    /**
+     * JSON 格式通过请求主体（BODY）传输  获取参数
+     **/
     public String getReqParamFromBody() {
 
         String body = "";
 
-        if(isConvertJSON()){
+        if (isConvertJSON()) {
 
             try {
                 String str;
-                while((str = request.getReader().readLine()) != null){
+                while ((str = request.getReader().readLine()) != null) {
                     body += str;
                 }
 
@@ -69,23 +69,25 @@ public class RequestKitBean {
                 log.error("请求参数转换异常！ params=[{}]", body);
                 throw new BizException(ApiCodeEnum.PARAMS_ERROR, "转换异常");
             }
-        }else {
+        } else {
             return body;
         }
     }
 
 
-    /**request.getParameter 获取参数 并转换为JSON格式 **/
+    /**
+     * request.getParameter 获取参数 并转换为JSON格式
+     **/
     public JSONObject reqParam2JSON() {
 
         JSONObject returnObject = new JSONObject();
 
-        if(isConvertJSON()){
+        if (isConvertJSON()) {
 
             String body = "";
             try {
-                body=request.getReader().lines().collect(Collectors.joining(""));
-                if(StringUtils.isEmpty(body)) {
+                body = request.getReader().lines().collect(Collectors.joining(""));
+                if (StringUtils.isEmpty(body)) {
                     return returnObject;
                 }
                 return JSONObject.parseObject(body);
@@ -108,28 +110,28 @@ public class RequestKitBean {
             entry = (Map.Entry) entries.next();
             name = (String) entry.getKey();
             Object valueObj = entry.getValue();
-            if(null == valueObj){
+            if (null == valueObj) {
                 value = "";
-            }else if(valueObj instanceof String[]){
-                String[] values = (String[])valueObj;
-                for(int i=0;i<values.length;i++){
+            } else if (valueObj instanceof String[]) {
+                String[] values = (String[]) valueObj;
+                for (int i = 0; i < values.length; i++) {
                     value = values[i] + ",";
                 }
-                value = value.substring(0, value.length()-1);
-            }else{
+                value = value.substring(0, value.length() - 1);
+            } else {
                 value = valueObj.toString();
             }
 
-            if(!name.contains("[")){
+            if (!name.contains("[")) {
                 returnObject.put(name, value);
                 continue;
             }
             //添加对json对象解析的支持  example: {ps[abc] : 1}
             String mainKey = name.substring(0, name.indexOf("["));
-            String subKey = name.substring(name.indexOf("[") + 1 , name.indexOf("]"));
+            String subKey = name.substring(name.indexOf("[") + 1, name.indexOf("]"));
             JSONObject subJson = new JSONObject();
-            if(returnObject.get(mainKey) != null) {
-                subJson = (JSONObject)returnObject.get(mainKey);
+            if (returnObject.get(mainKey) != null) {
+                subJson = (JSONObject) returnObject.get(mainKey);
             }
             subJson.put(subKey, value);
             returnObject.put(mainKey, subJson);
@@ -139,14 +141,16 @@ public class RequestKitBean {
     }
 
 
-    /** 获取json格式的请求参数 **/
-    public JSONObject getReqParamJSON(){
+    /**
+     * 获取json格式的请求参数
+     **/
+    public JSONObject getReqParamJSON() {
 
         //将转换好的reqParam JSON格式的对象保存在当前请求上下文对象中进行保存；
         // 注意1： springMVC的CTRL默认单例模式， 不可使用局部变量保存，会出现线程安全问题；
         // 注意2： springMVC的请求模式为线程池，如果采用ThreadLocal保存对象信息，可能会出现不清空或者被覆盖的问题。
         Object reqParamObject = RequestContextHolder.getRequestAttributes().getAttribute(REQ_CONTEXT_KEY_PARAMJSON, RequestAttributes.SCOPE_REQUEST);
-        if(reqParamObject == null){
+        if (reqParamObject == null) {
             JSONObject reqParam = reqParam2JSON();
             RequestContextHolder.getRequestAttributes().setAttribute(REQ_CONTEXT_KEY_PARAMJSON, reqParam, RequestAttributes.SCOPE_REQUEST);
             return reqParam;
@@ -154,23 +158,27 @@ public class RequestKitBean {
         return (JSONObject) reqParamObject;
     }
 
-    /** 判断请求参数是否转换为json格式 */
-    private boolean isConvertJSON(){
+    /**
+     * 判断请求参数是否转换为json格式
+     */
+    private boolean isConvertJSON() {
 
         String contentType = request.getContentType();
 
         //有contentType  && json格式，  get请求不转换
-        if(contentType != null
+        if (contentType != null
                 && contentType.toLowerCase().indexOf("application/json") >= 0
                 && !request.getMethod().equalsIgnoreCase("GET")
-        ){ //application/json 需要转换为json格式；
+        ) { //application/json 需要转换为json格式；
             return true;
         }
 
         return false;
     }
 
-    /** 获取客户端ip地址 **/
+    /**
+     * 获取客户端ip地址
+     **/
     public String getClientIp() {
         String ipAddress = null;
         ipAddress = request.getHeader("x-forwarded-for");

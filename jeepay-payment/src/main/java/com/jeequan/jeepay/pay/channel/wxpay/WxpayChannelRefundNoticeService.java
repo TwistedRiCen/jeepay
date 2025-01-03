@@ -61,7 +61,8 @@ import java.security.PrivateKey;
 @Slf4j
 public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNoticeService {
 
-    @Autowired RefundOrderService refundOrderService;
+    @Autowired
+    RefundOrderService refundOrderService;
 
     @Override
     public String getIfCode() {
@@ -74,13 +75,13 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
         try {
             // 获取订单信息
             RefundOrder refundOrder = refundOrderService.getById(urlOrderId);
-            if(refundOrder == null){
+            if (refundOrder == null) {
                 throw new BizException("订单不存在");
             }
 
             //获取支付参数 (缓存数据) 和 商户信息
             MchAppConfigContext mchAppConfigContext = configContextQueryService.queryMchInfoAndAppInfo(refundOrder.getMchNo(), refundOrder.getAppId());
-            if(mchAppConfigContext == null){
+            if (mchAppConfigContext == null) {
                 throw new BizException("获取商户信息失败");
             }
             String apiVersion = ""; // 接口类型
@@ -89,23 +90,23 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
             if (CS.MCH_TYPE_NORMAL == mchType) {
                 WxpayNormalMchParams normalMchParams = (WxpayNormalMchParams) configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
                 apiVersion = normalMchParams.getApiVersion();
-                wxKey = CS.PAY_IF_VERSION.WX_V2.equals(apiVersion)?normalMchParams.getKey():normalMchParams.getApiV3Key();
-            }else if (CS.MCH_TYPE_ISVSUB == mchType) {
+                wxKey = CS.PAY_IF_VERSION.WX_V2.equals(apiVersion) ? normalMchParams.getKey() : normalMchParams.getApiV3Key();
+            } else if (CS.MCH_TYPE_ISVSUB == mchType) {
                 WxpayIsvParams wxpayIsvParams = (WxpayIsvParams) configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
                 apiVersion = wxpayIsvParams.getApiVersion();
-                wxKey = CS.PAY_IF_VERSION.WX_V2.equals(apiVersion)?wxpayIsvParams.getKey():wxpayIsvParams.getApiV3Key();
-            }else {
+                wxKey = CS.PAY_IF_VERSION.WX_V2.equals(apiVersion) ? wxpayIsvParams.getKey() : wxpayIsvParams.getApiV3Key();
+            } else {
                 throw new BizException("商户类型错误");
             }
 
-            if(CS.PAY_IF_VERSION.WX_V3.equals(apiVersion)){     // V3接口回调
+            if (CS.PAY_IF_VERSION.WX_V3.equals(apiVersion)) {     // V3接口回调
                 // 验签 && 获取订单回调数据
                 WxPayRefundNotifyV3Result.DecryptNotifyResult result = parseOrderNotifyV3Result(request, mchAppConfigContext);
                 return MutablePair.of(urlOrderId, result);
 
-            } else if (CS.PAY_IF_VERSION.WX_V2.equals(apiVersion)){     // V2接口回调
+            } else if (CS.PAY_IF_VERSION.WX_V2.equals(apiVersion)) {     // V2接口回调
                 String xmlResult = IOUtils.toString(request.getInputStream(), request.getCharacterEncoding());
-                if(StringUtils.isEmpty(xmlResult)) {
+                if (StringUtils.isEmpty(xmlResult)) {
                     return null;
                 }
                 WxPayRefundNotifyResult result = WxPayRefundNotifyResult.fromXML(xmlResult, wxKey);
@@ -132,7 +133,7 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
                 String refundStatus = notifyResult.getRefundStatus();
                 if ("SUCCESS".equals(refundStatus)) {
                     result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-                }else {  //CHANGE—退款异常， REFUNDCLOSE—退款关闭
+                } else {  //CHANGE—退款异常， REFUNDCLOSE—退款关闭
                     result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL); //退款失败
                 }
                 result.setChannelOrderId(notifyResult.getTransactionId()); // 渠道订单号
@@ -143,7 +144,7 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
 
                 ResponseEntity okResponse = jsonResp(resJSON);
                 result.setResponseEntity(okResponse); //响应数据
-            }else if (CS.PAY_IF_VERSION.WX_V2.equals(wxServiceWrapper.getApiVersion())) {
+            } else if (CS.PAY_IF_VERSION.WX_V2.equals(wxServiceWrapper.getApiVersion())) {
                 // 获取回调参数
                 WxPayRefundNotifyResult.ReqInfo notifyResult = (WxPayRefundNotifyResult.ReqInfo) params;
                 // 验证参数
@@ -152,11 +153,11 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
                 result.setChannelOrderId(notifyResult.getTransactionId()); //渠道订单号
                 if ("SUCCESS".equals(notifyResult.getRefundStatus())) {
                     result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-                }else {  //CHANGE—退款异常， REFUNDCLOSE—退款关闭
+                } else {  //CHANGE—退款异常， REFUNDCLOSE—退款关闭
                     result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL); //退款失败
                 }
                 result.setResponseEntity(textResp(WxPayNotifyResponse.successResp("OK")));
-            }else {
+            } else {
                 result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL); //退款失败
             }
             return result;
@@ -168,7 +169,8 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
 
     /**
      * V3校验通知签名
-     * @param request 请求信息
+     *
+     * @param request             请求信息
      * @param mchAppConfigContext 商户配置
      * @return true:校验通过 false:校验不通过
      */
@@ -201,6 +203,7 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
 
     /**
      * V3接口验证微信支付通知参数
+     *
      * @return
      */
     public void verifyWxPay3Params(WxPayRefundNotifyV3Result.DecryptNotifyResult result, RefundOrder refundOrder) {
@@ -219,6 +222,7 @@ public class WxpayChannelRefundNoticeService extends AbstractChannelRefundNotice
 
     /**
      * V2接口验证微信支付通知参数
+     *
      * @return
      */
     public void verifyWxPay2Params(WxPayRefundNotifyResult.ReqInfo result, RefundOrder refundOrder) {

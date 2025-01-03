@@ -39,7 +39,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -57,15 +61,18 @@ import java.util.List;
 @RequestMapping("/api/mch/payPassages")
 public class MchPayPassageConfigController extends CommonCtrl {
 
-    @Autowired private MchPayPassageService mchPayPassageService;
-    @Autowired private PayWayService payWayService;
-    @Autowired private MchInfoService mchInfoService;
+    @Autowired
+    private MchPayPassageService mchPayPassageService;
+    @Autowired
+    private PayWayService payWayService;
+    @Autowired
+    private MchInfoService mchInfoService;
 
     /**
      * @Author: ZhuXiao
      * @Description: 查询支付方式列表，并添加是否配置支付通道状态
      * @Date: 10:58 2021/5/13
-    */
+     */
     @ApiOperation("查询支付方式列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -122,11 +129,11 @@ public class MchPayPassageConfigController extends CommonCtrl {
     }
 
     /**
+     * @return
      * @Author: ZhuXiao
      * @Description: 根据appId、支付方式查询可用的支付接口列表
      * @Date: 11:05 2021/5/13
-     * @return
-    */
+     */
     @ApiOperation("根据[应用ID]、[支付方式代码]查询可用的支付接口列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -153,7 +160,7 @@ public class MchPayPassageConfigController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description:
      * @Date: 11:05 2021/5/13
-    */
+     */
     @ApiOperation("商户支付通道详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -176,7 +183,7 @@ public class MchPayPassageConfigController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 应用支付通道配置
      * @Date: 11:05 2021/5/13
-    */
+     */
     @ApiOperation("更新商户支付通道")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -193,7 +200,7 @@ public class MchPayPassageConfigController extends CommonCtrl {
             List<MchPayPassage> mchPayPassageList = JSONArray.parseArray(reqParams, MchPayPassage.class);
             mchPayPassageService.saveOrUpdateBatchSelf(mchPayPassageList, getCurrentMchNo());
             return ApiRes.ok();
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ApiRes.fail(ApiCodeEnum.SYSTEM_ERROR);
         }
     }

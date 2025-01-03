@@ -29,23 +29,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /***
-* 订单处理通用逻辑
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/8/22 16:50
-*/
+ * 订单处理通用逻辑
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/8/22 16:50
+ */
 @Service
 @Slf4j
 public class PayOrderProcessService {
 
 
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private PayMchNotifyService payMchNotifyService;
-    @Autowired private IMQSender mqSender;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private PayMchNotifyService payMchNotifyService;
+    @Autowired
+    private IMQSender mqSender;
 
-    /** 明确成功的处理逻辑（除更新订单其他业务） **/
-    public void confirmSuccess(PayOrder payOrder){
+    /**
+     * 明确成功的处理逻辑（除更新订单其他业务）
+     **/
+    public void confirmSuccess(PayOrder payOrder) {
 
         // 查询查询订单详情
         payOrder = payOrderService.getById(payOrder.getPayOrderId());
@@ -62,15 +67,16 @@ public class PayOrderProcessService {
     }
 
 
-
-    /** 更新订单自动分账业务 **/
-    private void updatePayOrderAutoDivision(PayOrder payOrder){
+    /**
+     * 更新订单自动分账业务
+     **/
+    private void updatePayOrderAutoDivision(PayOrder payOrder) {
 
         try {
 
             //默认不分账  || 其他非【自动分账】逻辑时， 不处理
-            if(payOrder == null || payOrder.getDivisionMode() == null || payOrder.getDivisionMode() != PayOrder.DIVISION_MODE_AUTO){
-                return ;
+            if (payOrder == null || payOrder.getDivisionMode() == null || payOrder.getDivisionMode() != PayOrder.DIVISION_MODE_AUTO) {
+                return;
             }
 
             //更新订单表分账状态为： 等待分账任务处理
@@ -80,9 +86,9 @@ public class PayOrderProcessService {
                     .eq(PayOrder::getDivisionState, PayOrder.DIVISION_STATE_UNHAPPEN)
             );
 
-            if(updDivisionState){
+            if (updDivisionState) {
                 //推送到分账MQ
-                mqSender.send(PayOrderDivisionMQ.build(payOrder.getPayOrderId(), CS.YES,null), 80); //80s 后执行
+                mqSender.send(PayOrderDivisionMQ.build(payOrder.getPayOrderId(), CS.YES, null), 80); //80s 后执行
             }
 
         } catch (Exception e) {
@@ -96,17 +102,17 @@ public class PayOrderProcessService {
      * 支付中 --》 支付成功或者失败
      * **/
     @Transactional
-    public void updateIngAndSuccessOrFailByCreatebyOrder(PayOrder payOrder, ChannelRetMsg channelRetMsg){
+    public void updateIngAndSuccessOrFailByCreatebyOrder(PayOrder payOrder, ChannelRetMsg channelRetMsg) {
 
         boolean isSuccess = payOrderService.updateInit2Ing(payOrder.getPayOrderId(), payOrder);
-        if(!isSuccess){
+        if (!isSuccess) {
             log.error("updateInit2Ing更新异常 payOrderId={}", payOrder.getPayOrderId());
             throw new BizException("更新订单异常!");
         }
 
         isSuccess = payOrderService.updateIng2SuccessOrFail(payOrder.getPayOrderId(), payOrder.getState(),
                 channelRetMsg.getChannelOrderId(), channelRetMsg.getChannelUserId(), channelRetMsg.getChannelErrCode(), channelRetMsg.getChannelErrMsg());
-        if(!isSuccess){
+        if (!isSuccess) {
             log.error("updateIng2SuccessOrFail更新异常 payOrderId={}", payOrder.getPayOrderId());
             throw new BizException("更新订单异常!");
         }

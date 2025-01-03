@@ -21,14 +21,20 @@ import com.jeequan.jeepay.components.mq.vender.IMQSender;
 import com.jeequan.jeepay.core.aop.MethodLog;
 import com.jeequan.jeepay.core.constants.ApiCodeEnum;
 import com.jeequan.jeepay.core.constants.CS;
-import com.jeequan.jeepay.core.entity.*;
+import com.jeequan.jeepay.core.entity.MchApp;
+import com.jeequan.jeepay.core.entity.MchInfo;
+import com.jeequan.jeepay.core.entity.PayInterfaceConfig;
+import com.jeequan.jeepay.core.entity.PayInterfaceDefine;
 import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.core.model.ApiRes;
 import com.jeequan.jeepay.core.model.DBApplicationConfig;
 import com.jeequan.jeepay.core.model.params.NormalMchParams;
 import com.jeequan.jeepay.core.utils.StringKit;
 import com.jeequan.jeepay.mch.ctrl.CommonCtrl;
-import com.jeequan.jeepay.service.impl.*;
+import com.jeequan.jeepay.service.impl.MchAppService;
+import com.jeequan.jeepay.service.impl.MchInfoService;
+import com.jeequan.jeepay.service.impl.PayInterfaceConfigService;
+import com.jeequan.jeepay.service.impl.SysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -36,7 +42,12 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -55,17 +66,22 @@ import java.util.Set;
 @RequestMapping("/api/mch/payConfigs")
 public class MchPayInterfaceConfigController extends CommonCtrl {
 
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
-    @Autowired private MchInfoService mchInfoService;
-    @Autowired private MchAppService mchAppService;
-    @Autowired private SysConfigService sysConfigService;
-    @Autowired private IMQSender mqSender;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private MchInfoService mchInfoService;
+    @Autowired
+    private MchAppService mchAppService;
+    @Autowired
+    private SysConfigService sysConfigService;
+    @Autowired
+    private IMQSender mqSender;
 
     /**
      * @Author: ZhuXiao
      * @Description: 查询商户支付接口配置列表
      * @Date: 10:51 2021/5/13
-    */
+     */
     @ApiOperation("查询应用支付接口配置列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -89,7 +105,7 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 根据 商户号、接口类型 获取商户参数配置
      * @Date: 10:54 2021/5/13
-    */
+     */
     @ApiOperation("根据应用ID、接口类型 获取应用参数配置")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -126,7 +142,7 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 更新商户支付参数
      * @Date: 10:56 2021/5/13
-    */
+     */
     @ApiOperation("更新商户支付参数")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -164,7 +180,7 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
 
             // 合并支付参数
             payInterfaceConfig.setIfParams(StringKit.marge(dbRecoed.getIfParams(), payInterfaceConfig.getIfParams()));
-        }else {
+        } else {
             payInterfaceConfig.setCreatedUid(userId);
             payInterfaceConfig.setCreatedBy(realName);
         }
@@ -178,7 +194,9 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
         return ApiRes.ok();
     }
 
-    /** 查询支付宝商户授权URL **/
+    /**
+     * 查询支付宝商户授权URL
+     **/
     @ApiOperation("查询支付宝商户授权URL")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -205,26 +223,28 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
     }
 
 
-    /** 查询当前应用支持的支付接口 */
+    /**
+     * 查询当前应用支持的支付接口
+     */
     @ApiOperation("查询当前应用支持的支付接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
             @ApiImplicitParam(name = "appId", value = "应用ID", required = true)
     })
     @PreAuthorize("hasAuthority( 'ENT_DIVISION_RECEIVER_ADD' )")
-    @RequestMapping(value="ifCodes/{appId}", method = RequestMethod.GET)
+    @RequestMapping(value = "ifCodes/{appId}", method = RequestMethod.GET)
     public ApiRes<Set<String>> getIfCodeByAppId(@PathVariable("appId") String appId) {
 
-        if(mchAppService.count(MchApp.gw().eq(MchApp::getMchNo, getCurrentMchNo()).eq(MchApp::getAppId, appId)) <= 0){
+        if (mchAppService.count(MchApp.gw().eq(MchApp::getMchNo, getCurrentMchNo()).eq(MchApp::getAppId, appId)) <= 0) {
             throw new BizException("商户应用不存在");
         }
 
         Set<String> result = new HashSet<>();
 
         payInterfaceConfigService.list(PayInterfaceConfig.gw().select(PayInterfaceConfig::getIfCode)
-        .eq(PayInterfaceConfig::getState, CS.PUB_USABLE)
-        .eq(PayInterfaceConfig::getInfoId, appId)
-        .eq(PayInterfaceConfig::getInfoType, CS.INFO_TYPE_MCH_APP)
+                .eq(PayInterfaceConfig::getState, CS.PUB_USABLE)
+                .eq(PayInterfaceConfig::getInfoId, appId)
+                .eq(PayInterfaceConfig::getInfoType, CS.INFO_TYPE_MCH_APP)
         ).stream().forEach(r -> result.add(r.getIfCode()));
 
         return ApiRes.ok(result);

@@ -18,22 +18,24 @@ package com.jeequan.jeepay.pay.rqrs.payorder;
 import com.jeequan.jeepay.pay.rqrs.AbstractMchAppRQ;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-
 /*
-* 查询订单请求参数对象
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:40
-*/
+ * 查询订单请求参数对象
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:40
+ */
 @Data
 public class QueryPayOrderRQ extends AbstractMchAppRQ {
 
-    /** 商户订单号 **/
+    /**
+     * 商户订单号
+     **/
     private String mchOrderNo;
 
-    /** 支付系统订单号 **/
+    /**
+     * 支付系统订单号
+     **/
     private String payOrderId;
 
 }

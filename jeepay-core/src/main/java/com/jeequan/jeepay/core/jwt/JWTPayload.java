@@ -40,9 +40,10 @@ public class JWTPayload {
     private Long created;         //创建时间, 格式：13位时间戳
     private String cacheKey;      //redis保存的key
 
-    protected JWTPayload(){}
+    protected JWTPayload() {
+    }
 
-    public JWTPayload(JeeUserDetails jeeUserDetails){
+    public JWTPayload(JeeUserDetails jeeUserDetails) {
 
         this.setSysUserId(jeeUserDetails.getSysUser().getSysUserId());
         this.setCreated(System.currentTimeMillis());
@@ -50,9 +51,11 @@ public class JWTPayload {
     }
 
 
-    /** toMap **/
-    public Map<String, Object> toMap(){
-        JSONObject json = (JSONObject)JSONObject.toJSON(this);
+    /**
+     * toMap
+     **/
+    public Map<String, Object> toMap() {
+        JSONObject json = (JSONObject) JSONObject.toJSON(this);
         return json.toJavaObject(Map.class);
     }
 

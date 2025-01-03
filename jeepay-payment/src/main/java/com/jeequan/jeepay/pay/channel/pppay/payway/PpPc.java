@@ -15,7 +15,16 @@ import com.jeequan.jeepay.pay.util.ApiResBuilder;
 import com.paypal.http.HttpResponse;
 import com.paypal.http.exceptions.HttpException;
 import com.paypal.http.serializer.Json;
-import com.paypal.orders.*;
+import com.paypal.orders.AmountBreakdown;
+import com.paypal.orders.AmountWithBreakdown;
+import com.paypal.orders.ApplicationContext;
+import com.paypal.orders.Item;
+import com.paypal.orders.LinkDescription;
+import com.paypal.orders.Money;
+import com.paypal.orders.Order;
+import com.paypal.orders.OrderRequest;
+import com.paypal.orders.OrdersCreateRequest;
+import com.paypal.orders.PurchaseUnitRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -53,7 +62,7 @@ public class PpPc extends PppayPaymentService {
                 .userAction("PAY_NOW")
                 .shippingPreference("NO_SHIPPING");
 
-        if(StringUtils.isNotBlank(bizRQ.getCancelUrl())) {
+        if (StringUtils.isNotBlank(bizRQ.getCancelUrl())) {
             applicationContext.cancelUrl(bizRQ.getCancelUrl());
         }
 
@@ -106,9 +115,9 @@ public class PpPc extends PppayPaymentService {
         ChannelRetMsg channelRetMsg = new ChannelRetMsg();
 
         HttpResponse<Order> response;
-        try{
+        try {
             response = paypalWrapper.getClient().execute(request);
-        }catch (HttpException e) {
+        } catch (HttpException e) {
             String message = e.getMessage();
             cn.hutool.json.JSONObject messageObj = JSONUtil.parseObj(message);
             String issue = messageObj.getByPath("details[0].issue", String.class);

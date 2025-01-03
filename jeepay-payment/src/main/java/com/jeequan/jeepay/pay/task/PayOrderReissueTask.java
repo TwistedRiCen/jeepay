@@ -30,22 +30,24 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /*
-* 补单定时任务
-* 
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:47
-*/
+ * 补单定时任务
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:47
+ */
 @Slf4j
 @Component
 public class PayOrderReissueTask {
 
     private static final int QUERY_PAGE_SIZE = 100; //每次查询数量
 
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private ChannelOrderReissueService channelOrderReissueService;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private ChannelOrderReissueService channelOrderReissueService;
 
-    @Scheduled(cron="0 0/1 * * * ?") // 每分钟执行一次
+    @Scheduled(cron = "0 0/1 * * * ?") // 每分钟执行一次
     public void start() {
 
         //当前时间 减去10分钟。
@@ -55,21 +57,21 @@ public class PayOrderReissueTask {
         LambdaQueryWrapper<PayOrder> lambdaQueryWrapper = PayOrder.gw().eq(PayOrder::getState, PayOrder.STATE_ING).le(PayOrder::getCreatedAt, offsetDate);
 
         int currentPageIndex = 1; //当前页码
-        while(true){
+        while (true) {
 
             try {
                 IPage<PayOrder> payOrderIPage = payOrderService.page(new Page(currentPageIndex, QUERY_PAGE_SIZE), lambdaQueryWrapper);
 
-                if(payOrderIPage == null || payOrderIPage.getRecords().isEmpty()){ //本次查询无结果, 不再继续查询;
+                if (payOrderIPage == null || payOrderIPage.getRecords().isEmpty()) { //本次查询无结果, 不再继续查询;
                     break;
                 }
 
-                for(PayOrder payOrder: payOrderIPage.getRecords()){
+                for (PayOrder payOrder : payOrderIPage.getRecords()) {
                     channelOrderReissueService.processPayOrder(payOrder);
                 }
 
                 //已经到达页码最大量，无需再次查询
-                if(payOrderIPage.getPages() <= currentPageIndex){
+                if (payOrderIPage.getPages() <= currentPageIndex) {
                     break;
                 }
                 currentPageIndex++;
@@ -82,7 +84,6 @@ public class PayOrderReissueTask {
 
         }
     }
-
 
 
 }

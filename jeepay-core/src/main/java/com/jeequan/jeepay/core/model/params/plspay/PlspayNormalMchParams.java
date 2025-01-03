@@ -32,24 +32,30 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class PlspayNormalMchParams extends NormalMchParams {
 
-    /** 商户号 */
-    private String merchantNo;
-
-    /** 应用ID */
-    private String appId;
-
-    /** 签名方式 **/
-    private String signType;
-
-    /** md5秘钥 */
-    private String appSecret;
-
-    /** RSA2: 应用私钥 */
-    private String rsa2AppPrivateKey;
-
-    /** RSA2: 支付网关公钥 */
+    /**
+     * RSA2: 支付网关公钥
+     */
     public String rsa2PayPublicKey;
-
+    /**
+     * 商户号
+     */
+    private String merchantNo;
+    /**
+     * 应用ID
+     */
+    private String appId;
+    /**
+     * 签名方式
+     **/
+    private String signType;
+    /**
+     * md5秘钥
+     */
+    private String appSecret;
+    /**
+     * RSA2: 应用私钥
+     */
+    private String rsa2AppPrivateKey;
 
     @Override
     public String deSenData() {

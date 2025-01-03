@@ -25,13 +25,13 @@ import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.core.utils.AmountUtil;
 import com.jeequan.jeepay.pay.channel.alipay.AlipayKit;
 import com.jeequan.jeepay.pay.channel.alipay.AlipayPaymentService;
+import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
+import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
+import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.AliJsapiOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.AliJsapiOrderRS;
-import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
-import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.util.ApiResBuilder;
-import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +49,7 @@ public class AliJsapi extends AlipayPaymentService {
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
 
         AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getBuyerUserId())){
+        if (StringUtils.isEmpty(bizRQ.getBuyerUserId())) {
             throw new BizException("[buyerUserId]不可为空");
         }
 
@@ -57,7 +57,7 @@ public class AliJsapi extends AlipayPaymentService {
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception{
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception {
 
         AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ) rq;
 
@@ -90,10 +90,10 @@ public class AliJsapi extends AlipayPaymentService {
         res.setAlipayTradeNo(alipayResp.getTradeNo());
 
         channelRetMsg.setChannelOrderId(alipayResp.getTradeNo());
-        if(alipayResp.isSuccess()){ //业务处理成功
+        if (alipayResp.isSuccess()) { //业务处理成功
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
 
-        }else{
+        } else {
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
             channelRetMsg.setChannelErrCode(AlipayKit.appendErrCode(alipayResp.getCode(), alipayResp.getSubCode()));
             channelRetMsg.setChannelErrMsg(AlipayKit.appendErrMsg(alipayResp.getMsg(), alipayResp.getSubMsg()));

@@ -28,7 +28,9 @@ import com.jeequan.jeepay.core.entity.RefundOrder;
  */
 public interface RefundOrderMapper extends BaseMapper<RefundOrder> {
 
-    /** 查询全部退成功金额 **/
+    /**
+     * 查询全部退成功金额
+     **/
     Long sumSuccessRefundAmount(String payOrderId);
 
 }

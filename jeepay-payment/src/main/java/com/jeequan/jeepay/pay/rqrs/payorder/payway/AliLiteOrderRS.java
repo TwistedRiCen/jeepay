@@ -30,16 +30,18 @@ import lombok.Data;
 @Data
 public class AliLiteOrderRS extends UnifiedOrderRS {
 
-    /** 调起支付插件的支付宝订单号 **/
+    /**
+     * 调起支付插件的支付宝订单号
+     **/
     private String alipayTradeNo;
 
     @Override
-    public String buildPayDataType(){
+    public String buildPayDataType() {
         return CS.PAY_DATA_TYPE.ALI_APP;
     }
 
     @Override
-    public String buildPayData(){
+    public String buildPayData() {
         return JsonKit.newJson("alipayTradeNo", alipayTradeNo).toString();
     }
 

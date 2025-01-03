@@ -37,11 +37,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class IsvInfoService extends ServiceImpl<IsvInfoMapper, IsvInfo> {
 
-    @Autowired private MchInfoService mchInfoService;
+    @Autowired
+    private MchInfoService mchInfoService;
 
-    @Autowired private IsvInfoService isvInfoService;
+    @Autowired
+    private IsvInfoService isvInfoService;
 
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
 
     @Transactional
     public void removeByIsvNo(String isvNo) {

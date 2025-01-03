@@ -21,7 +21,14 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jeequan.jeepay.core.constants.ApiCodeEnum;
 import com.jeequan.jeepay.core.constants.CS;
-import com.jeequan.jeepay.core.entity.*;
+import com.jeequan.jeepay.core.entity.IsvInfo;
+import com.jeequan.jeepay.core.entity.MchApp;
+import com.jeequan.jeepay.core.entity.MchInfo;
+import com.jeequan.jeepay.core.entity.MchPayPassage;
+import com.jeequan.jeepay.core.entity.PayInterfaceConfig;
+import com.jeequan.jeepay.core.entity.PayOrder;
+import com.jeequan.jeepay.core.entity.SysUser;
+import com.jeequan.jeepay.core.entity.SysUserAuth;
 import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.service.mapper.MchInfoMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -44,19 +51,26 @@ import java.util.List;
 @Service
 public class MchInfoService extends ServiceImpl<MchInfoMapper, MchInfo> {
 
-    @Autowired private SysUserService sysUserService;
+    @Autowired
+    private SysUserService sysUserService;
 
-    @Autowired private PayOrderService payOrderService;
+    @Autowired
+    private PayOrderService payOrderService;
 
-    @Autowired private MchPayPassageService mchPayPassageService;
+    @Autowired
+    private MchPayPassageService mchPayPassageService;
 
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
 
-    @Autowired private SysUserAuthService sysUserAuthService;
+    @Autowired
+    private SysUserAuthService sysUserAuthService;
 
-    @Autowired private IsvInfoService isvInfoService;
+    @Autowired
+    private IsvInfoService isvInfoService;
 
-    @Autowired private MchAppService mchAppService;
+    @Autowired
+    private MchAppService mchAppService;
 
     @Transactional(rollbackFor = Exception.class)
     public void addMch(MchInfo mchInfo, String loginUserName) {
@@ -113,7 +127,9 @@ public class MchInfoService extends ServiceImpl<MchInfoMapper, MchInfo> {
 
     }
 
-    /** 删除商户 **/
+    /**
+     * 删除商户
+     **/
     @Transactional(rollbackFor = Exception.class)
     public List<Long> removeByMchNo(String mchNo) {
         try {
@@ -155,7 +171,7 @@ public class MchInfoService extends ServiceImpl<MchInfoMapper, MchInfo> {
             // 返回的用户id
             List<Long> userIdList = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(userList)) {
-                for (SysUser user:userList) {
+                for (SysUser user : userList) {
                     userIdList.add(user.getSysUserId());
                 }
                 // 5.删除当前商户用户子用户信息
@@ -174,7 +190,7 @@ public class MchInfoService extends ServiceImpl<MchInfoMapper, MchInfo> {
                 throw new BizException("删除当前商户失败");
             }
             return userIdList;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new BizException(e.getMessage());
         }
     }

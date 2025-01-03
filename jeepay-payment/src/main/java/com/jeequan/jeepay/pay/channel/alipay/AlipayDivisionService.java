@@ -17,7 +17,13 @@ package com.jeequan.jeepay.pay.channel.alipay;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
-import com.alipay.api.domain.*;
+import com.alipay.api.domain.AlipayTradeOrderSettleModel;
+import com.alipay.api.domain.AlipayTradeOrderSettleQueryModel;
+import com.alipay.api.domain.AlipayTradeRoyaltyRelationBindModel;
+import com.alipay.api.domain.OpenApiRoyaltyDetailInfoPojo;
+import com.alipay.api.domain.RoyaltyDetail;
+import com.alipay.api.domain.RoyaltyEntity;
+import com.alipay.api.domain.SettleExtendParams;
 import com.alipay.api.request.AlipayTradeOrderSettleQueryRequest;
 import com.alipay.api.request.AlipayTradeOrderSettleRequest;
 import com.alipay.api.request.AlipayTradeRoyaltyRelationBindRequest;
@@ -41,20 +47,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
-* 分账接口： 支付宝官方
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/8/22 09:05
-*/
+ * 分账接口： 支付宝官方
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/8/22 09:05
+ */
 @Slf4j
 @Service
 public class AlipayDivisionService implements IDivisionService {
 
-    @Autowired private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
 
     @Override
     public String getIfCode() {
@@ -81,7 +92,7 @@ public class AlipayDivisionService implements IDivisionService {
             RoyaltyEntity royaltyEntity = new RoyaltyEntity();
 
             royaltyEntity.setType("loginName");
-            if(RegKit.isAlipayUserId(mchDivisionReceiver.getAccNo())){
+            if (RegKit.isAlipayUserId(mchDivisionReceiver.getAccNo())) {
                 royaltyEntity.setType("userId");
             }
             royaltyEntity.setAccount(mchDivisionReceiver.getAccNo());
@@ -91,7 +102,7 @@ public class AlipayDivisionService implements IDivisionService {
 
             AlipayTradeRoyaltyRelationBindResponse alipayResp = configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).execute(request);
 
-            if(alipayResp.isSuccess()){
+            if (alipayResp.isSuccess()) {
                 return ChannelRetMsg.confirmSuccess(null);
             }
 
@@ -122,7 +133,7 @@ public class AlipayDivisionService implements IDivisionService {
 
         try {
 
-            if(recordList.isEmpty()){ // 当无分账用户时， 支付宝不允许发起分账请求， 支付宝没有完结接口，直接响应成功即可。
+            if (recordList.isEmpty()) { // 当无分账用户时， 支付宝不允许发起分账请求， 支付宝没有完结接口，直接响应成功即可。
                 return ChannelRetMsg.confirmSuccess(null);
             }
 
@@ -149,7 +160,7 @@ public class AlipayDivisionService implements IDivisionService {
 
                 PayOrderDivisionRecord record = recordList.get(i);
 
-                if(record.getCalDivisionAmount() <= 0){ //金额为 0 不参与分账处理
+                if (record.getCalDivisionAmount() <= 0) { //金额为 0 不参与分账处理
                     continue;
                 }
 
@@ -159,7 +170,7 @@ public class AlipayDivisionService implements IDivisionService {
                 // 入款信息
                 reqReceiver.setTransIn(record.getAccNo()); //收入方账号
                 reqReceiver.setTransInType("loginName");
-                if(RegKit.isAlipayUserId(record.getAccNo())){
+                if (RegKit.isAlipayUserId(record.getAccNo())) {
                     reqReceiver.setTransInType("userId");
                 }
                 // 分账金额
@@ -169,7 +180,7 @@ public class AlipayDivisionService implements IDivisionService {
 
             }
 
-            if(reqReceiverList.isEmpty()){ // 当无分账用户时， 支付宝不允许发起分账请求， 支付宝没有完结接口，直接响应成功即可。
+            if (reqReceiverList.isEmpty()) { // 当无分账用户时， 支付宝不允许发起分账请求， 支付宝没有完结接口，直接响应成功即可。
                 return ChannelRetMsg.confirmSuccess(null); // 明确成功。
             }
 
@@ -181,12 +192,12 @@ public class AlipayDivisionService implements IDivisionService {
             model.setExtendParams(settleExtendParams);
 
             //调起支付宝分账接口
-            if(log.isInfoEnabled()){
+            if (log.isInfoEnabled()) {
                 log.info("订单：[{}], 支付宝分账请求：{}", payOrder.getPayOrderId(), JSON.toJSONString(model));
             }
             AlipayTradeOrderSettleResponse alipayResp = configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).execute(request);
             log.info("订单：[{}], 支付宝分账响应：{}", payOrder.getPayOrderId(), alipayResp.getBody());
-            if(alipayResp.isSuccess()){
+            if (alipayResp.isSuccess()) {
                 return ChannelRetMsg.confirmSuccess(alipayResp.getTradeNo());
             }
 
@@ -241,7 +252,7 @@ public class AlipayDivisionService implements IDivisionService {
             AlipayTradeOrderSettleQueryResponse alipayResp = configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).execute(request);
             log.info("订单：[{}], 支付宝查询分账响应：{}", payOrder.getPayOrderId(), alipayResp.getBody());
 
-            if(alipayResp.isSuccess()){
+            if (alipayResp.isSuccess()) {
                 List<RoyaltyDetail> detailList = alipayResp.getRoyaltyDetailList();
                 if (CollectionUtil.isNotEmpty(detailList)) {
                     // 遍历匹配与当前账户相同的分账单
@@ -258,7 +269,7 @@ public class AlipayDivisionService implements IDivisionService {
 
                                 resultMap.put(recordId, ChannelRetMsg.confirmSuccess(null));
 
-                            }else if ("FAIL".equals(item.getState())) {
+                            } else if ("FAIL".equals(item.getState())) {
 
                                 resultMap.put(recordId, ChannelRetMsg.confirmFail(null, item.getErrorCode(), item.getErrorDesc()));
                             }
@@ -266,12 +277,12 @@ public class AlipayDivisionService implements IDivisionService {
                         }
                     });
                 }
-            }else {
+            } else {
                 log.error("支付宝分账查询响应异常, alipayResp:{}", JSON.toJSONString(alipayResp));
                 throw new BizException("支付宝分账查询响应异常：" + alipayResp.getSubMsg());
             }
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("查询分账信息异常", e);
             throw new BizException(e.getMessage());
         }

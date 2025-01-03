@@ -20,15 +20,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 /*
-* JWT工具包
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 16:32
-*/
+ * JWT工具包
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 16:32
+ */
 public class JWTUtils {
 
-    /** 生成token **/
+    /**
+     * 生成token
+     **/
     public static String generateToken(JWTPayload jwtPayload, String jwtSecret) {
         return Jwts.builder()
                 .setClaims(jwtPayload.toMap())
@@ -38,8 +40,10 @@ public class JWTUtils {
                 .compact();
     }
 
-    /** 根据token与秘钥 解析token并转换为 JWTPayload **/
-    public static JWTPayload parseToken(String token, String secret){
+    /**
+     * 根据token与秘钥 解析token并转换为 JWTPayload
+     **/
+    public static JWTPayload parseToken(String token, String secret) {
         try {
             Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 

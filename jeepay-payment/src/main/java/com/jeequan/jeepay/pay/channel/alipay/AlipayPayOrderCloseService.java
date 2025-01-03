@@ -37,7 +37,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlipayPayOrderCloseService implements IPayOrderCloseService {
 
-    @Autowired private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
 
     @Override
     public String getIfCode() {
@@ -45,7 +46,7 @@ public class AlipayPayOrderCloseService implements IPayOrderCloseService {
     }
 
     @Override
-    public ChannelRetMsg close(PayOrder payOrder, MchAppConfigContext mchAppConfigContext){
+    public ChannelRetMsg close(PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
 
         AlipayTradeCloseRequest req = new AlipayTradeCloseRequest();
 
@@ -62,7 +63,7 @@ public class AlipayPayOrderCloseService implements IPayOrderCloseService {
         // 返回状态成功
         if (resp.isSuccess()) {
             return ChannelRetMsg.confirmSuccess(resp.getTradeNo());
-        }else {
+        } else {
             return ChannelRetMsg.sysError(resp.getSubMsg());
         }
     }

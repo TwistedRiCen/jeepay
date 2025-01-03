@@ -22,9 +22,8 @@ import com.jeequan.jeepay.core.exception.ResponseException;
 import com.jeequan.jeepay.core.model.params.ysf.YsfpayIsvParams;
 import com.jeequan.jeepay.pay.channel.AbstractChannelNoticeService;
 import com.jeequan.jeepay.pay.channel.ysfpay.utils.YsfSignUtils;
-import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
-import com.jeequan.jeepay.pay.model.IsvConfigContext;
 import com.jeequan.jeepay.pay.model.MchAppConfigContext;
+import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -79,7 +78,7 @@ public class YsfpayChannelNoticeService extends AbstractChannelNoticeService {
             // 校验支付回调
             boolean verifyResult = verifyParams(jsonParams, payOrder, mchAppConfigContext);
             // 验证参数失败
-            if(!verifyResult){
+            if (!verifyResult) {
                 throw ResponseException.buildText("ERROR");
             }
             log.info("{}验证支付通知数据及签名通过", logPrefix);
@@ -98,12 +97,13 @@ public class YsfpayChannelNoticeService extends AbstractChannelNoticeService {
 
     /**
      * 验证云闪付支付通知参数
+     *
      * @return
      */
     public boolean verifyParams(JSONObject jsonParams, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
 
-        String orderNo = jsonParams.getString("orderNo");		// 商户订单号
-        String txnAmt = jsonParams.getString("txnAmt"); 		// 支付金额
+        String orderNo = jsonParams.getString("orderNo");        // 商户订单号
+        String txnAmt = jsonParams.getString("txnAmt");        // 支付金额
         if (StringUtils.isEmpty(orderNo)) {
             log.info("订单ID为空 [orderNo]={}", orderNo);
             return false;
@@ -113,13 +113,13 @@ public class YsfpayChannelNoticeService extends AbstractChannelNoticeService {
             return false;
         }
 
-        YsfpayIsvParams isvParams = (YsfpayIsvParams)configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
+        YsfpayIsvParams isvParams = (YsfpayIsvParams) configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
 
         //验签
         String ysfpayPublicKey = isvParams.getYsfpayPublicKey();
 
         //验签失败
-        if(!YsfSignUtils.validate((JSONObject) JSONObject.toJSON(jsonParams), ysfpayPublicKey)) {
+        if (!YsfSignUtils.validate((JSONObject) JSONObject.toJSON(jsonParams), ysfpayPublicKey)) {
             log.info("【云闪付回调】 验签失败！ 回调参数：parameter = {}, ysfpayPublicKey={} ", jsonParams, ysfpayPublicKey);
             return false;
         }

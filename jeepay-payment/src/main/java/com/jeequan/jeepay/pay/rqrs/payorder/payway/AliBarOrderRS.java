@@ -30,12 +30,12 @@ import lombok.Data;
 public class AliBarOrderRS extends UnifiedOrderRS {
 
     @Override
-    public String buildPayDataType(){
+    public String buildPayDataType() {
         return CS.PAY_DATA_TYPE.NONE;
     }
 
     @Override
-    public String buildPayData(){
+    public String buildPayData() {
         return "";
     }
 

@@ -19,17 +19,16 @@ import com.alipay.api.AlipayApiException;
 import com.jeequan.jeepay.core.constants.CS;
 import com.jeequan.jeepay.core.entity.PayOrder;
 import com.jeequan.jeepay.core.exception.BizException;
+import com.jeequan.jeepay.core.model.ApiRes;
 import com.jeequan.jeepay.core.utils.JeepayKit;
 import com.jeequan.jeepay.core.utils.SpringBeansUtil;
-import com.jeequan.jeepay.core.model.ApiRes;
 import com.jeequan.jeepay.pay.channel.IChannelUserService;
 import com.jeequan.jeepay.pay.ctrl.payorder.AbstractPayOrderController;
+import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.AliJsapiOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxJsapiOrderRQ;
 import com.jeequan.jeepay.pay.service.ConfigContextQueryService;
 import com.jeequan.jeepay.pay.service.PayMchNotifyService;
-import com.jeequan.jeepay.pay.service.ConfigContextService;
-import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.service.impl.PayOrderService;
 import com.jeequan.jeepay.service.impl.SysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,26 +37,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /*
-* 聚合码支付二维码收银台controller
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:27
-*/
+ * 聚合码支付二维码收银台controller
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:27
+ */
 @RestController
 @RequestMapping("/api/cashier")
 public class QrCashierController extends AbstractPayOrderController {
 
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private ConfigContextQueryService configContextQueryService;
-    @Autowired private SysConfigService sysConfigService;
-    @Autowired private PayMchNotifyService payMchNotifyService;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private SysConfigService sysConfigService;
+    @Autowired
+    private PayMchNotifyService payMchNotifyService;
 
     /**
      * 返回 oauth2【获取uerId跳转地址】
-     * **/
+     **/
     @PostMapping("/redirectUrl")
-    public ApiRes redirectUrl(){
+    public ApiRes redirectUrl() {
 
         //查询订单
         PayOrder payOrder = getPayOrder();
@@ -76,7 +79,7 @@ public class QrCashierController extends AbstractPayOrderController {
 
     /**
      * 获取userId
-     * **/
+     **/
     @PostMapping("/channelUserId")
     public ApiRes channelUserId() throws Exception {
 
@@ -95,7 +98,7 @@ public class QrCashierController extends AbstractPayOrderController {
 
     /**
      * 获取订单支付信息
-     * **/
+     **/
     @PostMapping("/payOrderInfo")
     public ApiRes payOrderInfo() throws Exception {
 
@@ -112,7 +115,9 @@ public class QrCashierController extends AbstractPayOrderController {
     }
 
 
-    /** 调起下单接口, 返回支付数据包  **/
+    /**
+     * 调起下单接口, 返回支付数据包
+     **/
     @PostMapping("/pay")
     public ApiRes pay() throws Exception {
 
@@ -123,9 +128,9 @@ public class QrCashierController extends AbstractPayOrderController {
 
         ApiRes apiRes = null;
 
-        if(wayCode.equals(CS.PAY_WAY_CODE.ALI_JSAPI)){
+        if (wayCode.equals(CS.PAY_WAY_CODE.ALI_JSAPI)) {
             apiRes = packageAlipayPayPackage(payOrder);
-        }else if(wayCode.equals(CS.PAY_WAY_CODE.WX_JSAPI)){
+        } else if (wayCode.equals(CS.PAY_WAY_CODE.WX_JSAPI)) {
             apiRes = packageWxpayPayPackage(payOrder);
         }
 
@@ -133,7 +138,9 @@ public class QrCashierController extends AbstractPayOrderController {
     }
 
 
-    /** 获取支付宝的 支付参数 **/
+    /**
+     * 获取支付宝的 支付参数
+     **/
     private ApiRes packageAlipayPayPackage(PayOrder payOrder) throws AlipayApiException {
 
         String channelUserId = getValStringRequired("channelUserId");
@@ -143,7 +150,9 @@ public class QrCashierController extends AbstractPayOrderController {
     }
 
 
-    /** 获取微信的 支付参数 **/
+    /**
+     * 获取微信的 支付参数
+     **/
     private ApiRes packageWxpayPayPackage(PayOrder payOrder) throws AlipayApiException {
 
         String openId = getValStringRequired("channelUserId");
@@ -153,20 +162,20 @@ public class QrCashierController extends AbstractPayOrderController {
     }
 
 
-    private String getToken(){
+    private String getToken() {
         return getValStringRequired("token");
     }
 
-    private String getWayCode(){
+    private String getWayCode() {
         return getValStringRequired("wayCode");
     }
 
-    private PayOrder getPayOrder(){
+    private PayOrder getPayOrder() {
 
         String payOrderId = JeepayKit.aesDecode(getToken()); //解析token
 
         PayOrder payOrder = payOrderService.getById(payOrderId);
-        if(payOrder == null || payOrder.getState() != PayOrder.STATE_INIT){
+        if (payOrder == null || payOrder.getState() != PayOrder.STATE_INIT) {
             throw new BizException("订单不存在或状态不正确");
         }
 
@@ -174,20 +183,16 @@ public class QrCashierController extends AbstractPayOrderController {
     }
 
 
-    private <T> T getServiceByWayCode(String wayCode, String serviceSuffix, Class<T> cls){
+    private <T> T getServiceByWayCode(String wayCode, String serviceSuffix, Class<T> cls) {
 
-        if(CS.PAY_WAY_CODE.ALI_JSAPI.equals(wayCode)){
+        if (CS.PAY_WAY_CODE.ALI_JSAPI.equals(wayCode)) {
             return SpringBeansUtil.getBean(CS.IF_CODE.ALIPAY + serviceSuffix, cls);
-        }else if(CS.PAY_WAY_CODE.WX_JSAPI.equals(wayCode)){
+        } else if (CS.PAY_WAY_CODE.WX_JSAPI.equals(wayCode)) {
             return SpringBeansUtil.getBean(CS.IF_CODE.WXPAY + serviceSuffix, cls);
         }
 
         return null;
     }
-
-
-
-
 
 
 }

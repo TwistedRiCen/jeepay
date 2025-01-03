@@ -32,12 +32,12 @@ import com.jeequan.jeepay.pay.rqrs.refund.RefundOrderRQ;
 import org.springframework.stereotype.Service;
 
 /*
-* 退款接口： 支付宝官方
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/17 9:38
-*/
+ * 退款接口： 支付宝官方
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/17 9:38
+ */
 @Service
 public class AlipayRefundService extends AbstractRefundService {
 
@@ -72,9 +72,9 @@ public class AlipayRefundService extends AbstractRefundService {
         channelRetMsg.setChannelAttach(response.getBody());
 
         // 调用成功
-        if(response.isSuccess()){
+        if (response.isSuccess()) {
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-        }else{
+        } else {
 
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
             channelRetMsg.setChannelErrCode(response.getSubCode());
@@ -103,9 +103,9 @@ public class AlipayRefundService extends AbstractRefundService {
 
         // 调用成功 & 金额相等  （传入不存在的outRequestNo支付宝仍然返回响应成功只是数据不存在， 调用isSuccess() 仍是成功, 此处需判断金额是否相等）
         Long channelRefundAmount = response.getRefundAmount() == null ? null : Long.parseLong(AmountUtil.convertDollar2Cent(response.getRefundAmount()));
-        if(response.isSuccess() && refundOrder.getRefundAmount().equals(channelRefundAmount)){
+        if (response.isSuccess() && refundOrder.getRefundAmount().equals(channelRefundAmount)) {
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
-        }else{
+        } else {
 
             channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING); //认为是处理中
 

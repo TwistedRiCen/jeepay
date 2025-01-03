@@ -18,11 +18,11 @@ package com.jeequan.jeepay.components.oss.constant;
 import lombok.Getter;
 
 /*
-* oss 服务枚举值
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/7/12 10:48
-*/
+ * oss 服务枚举值
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/7/12 10:48
+ */
 @Getter
 public enum OssServiceTypeEnum {
 
@@ -30,10 +30,12 @@ public enum OssServiceTypeEnum {
 
     ALIYUN_OSS("aliyun-oss");  //阿里云oss
 
-    /** 名称 **/
+    /**
+     * 名称
+     **/
     private String serviceName;
 
-    OssServiceTypeEnum(String serviceName){
+    OssServiceTypeEnum(String serviceName) {
         this.serviceName = serviceName;
     }
 }

@@ -27,13 +27,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
-* rocketMQ消息接收器：仅在vender=rocketMQ时 && 项目实现IMQReceiver接口时 进行实例化
-* 业务：  更新系统配置参数
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/7/22 17:06
-*/
+ * rocketMQ消息接收器：仅在vender=rocketMQ时 && 项目实现IMQReceiver接口时 进行实例化
+ * 业务：  更新系统配置参数
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/7/22 17:06
+ */
 @Component
 @ConditionalOnProperty(name = MQVenderCS.YML_VENDER_KEY, havingValue = MQVenderCS.ROCKET_MQ)
 @ConditionalOnBean(ResetAppConfigMQ.IMQReceiver.class)
@@ -43,9 +43,11 @@ public class ResetAppConfigRocketMQReceiver implements IMQMsgReceiver, RocketMQL
     @Autowired
     private ResetAppConfigMQ.IMQReceiver mqReceiver;
 
-    /** 接收 【 MQSendTypeEnum.BROADCAST  】 广播类型的消息 **/
+    /**
+     * 接收 【 MQSendTypeEnum.BROADCAST  】 广播类型的消息
+     **/
     @Override
-    public void receiveMsg(String msg){
+    public void receiveMsg(String msg) {
         mqReceiver.receive(ResetAppConfigMQ.parse(msg));
     }
 

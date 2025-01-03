@@ -47,7 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/refundOrder")
 public class RefundOrderController extends CommonCtrl {
 
-    @Autowired private RefundOrderService refundOrderService;
+    @Autowired
+    private RefundOrderService refundOrderService;
 
     /**
      * @author: pangxiaoyu
@@ -69,7 +70,7 @@ public class RefundOrderController extends CommonCtrl {
             @ApiImplicitParam(name = "mchType", value = "类型: 1-普通商户, 2-特约商户(服务商模式)")
     })
     @PreAuthorize("hasAuthority('ENT_REFUND_LIST')")
-    @RequestMapping(value="", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ApiPageRes<RefundOrder> list() {
 
         RefundOrder refundOrder = getObject(RefundOrder.class);
@@ -91,7 +92,7 @@ public class RefundOrderController extends CommonCtrl {
             @ApiImplicitParam(name = "refundOrderId", value = "退款订单号", required = true)
     })
     @PreAuthorize("hasAuthority('ENT_REFUND_ORDER_VIEW')")
-    @RequestMapping(value="/{refundOrderId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{refundOrderId}", method = RequestMethod.GET)
     public ApiRes detail(@PathVariable("refundOrderId") String refundOrderId) {
         RefundOrder refundOrder = refundOrderService.getById(refundOrderId);
         if (refundOrder == null) {

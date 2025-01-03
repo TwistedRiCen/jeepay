@@ -24,7 +24,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.*;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Enumeration;
 import java.util.TreeMap;
@@ -46,6 +52,7 @@ public class YsfSignUtils {
     private static final String CERTIFICATE_TYPE_X509 = "X.509"; //公钥证书类型
 
     private static final Logger logger = LoggerFactory.getLogger(YsfSignUtils.class);
+
     static {
         try {
             Security.addProvider(new BouncyCastleProvider());
@@ -54,14 +61,15 @@ public class YsfSignUtils {
         }
     }
 
-    /** 签名
+    /**
+     * 签名
      * 注意事项： 签名需商户申请 5.1.0版本证书；
      * 文档： https://open.unionpay.com/tjweb/acproduct/list?apiSvcId=468&index=2
      * 1. 排序并拼接为[key=value]格式；
      * 2. 对原始签名串使用SHA-256算法做摘要
      * 3. 使用商户私钥做签名（使用 SHA-256）
      * 4. 进行Base64处理
-     * **/
+     **/
     public static String signBy256(JSONObject params, String privateKeyFilePath, String certPwd) {
 
         try {
@@ -92,8 +100,10 @@ public class YsfSignUtils {
     }
 
 
-    /** 验签 **/
-    public static boolean validate(JSONObject params, String ysfpayPublicKey){
+    /**
+     * 验签
+     **/
+    public static boolean validate(JSONObject params, String ysfpayPublicKey) {
 
         //签名串
         String signature = params.getString("signature");
@@ -121,8 +131,10 @@ public class YsfSignUtils {
         return false;
     }
 
-    /** 进件验签 **/
-    public static boolean applyValidate(JSONObject params, String ysfpayPublicKey){
+    /**
+     * 进件验签
+     **/
+    public static boolean applyValidate(JSONObject params, String ysfpayPublicKey) {
 
         //签名串
         String signature = params.getString("signature");
@@ -150,22 +162,24 @@ public class YsfSignUtils {
         return false;
     }
 
-    /**  进件回调  将JSON中的数据转换成key1=value1&key2=value2的形式，忽略null内容 和 signature字段* */
+    /**
+     * 进件回调  将JSON中的数据转换成key1=value1&key2=value2的形式，忽略null内容 和 signature字段*
+     */
     private static String convertSignApplyNotifyString(JSONObject params) {
         TreeMap<String, Object> tree = new TreeMap<>();
 
         //1. 所有参数进行排序
-        params.keySet().stream().forEach( key -> tree.put(key, params.get(key)));
+        params.keySet().stream().forEach(key -> tree.put(key, params.get(key)));
 
         //2. 拼接为 key=value&形式
         StringBuffer stringBuffer = new StringBuffer();
-        tree.keySet().stream().forEach( key -> {
+        tree.keySet().stream().forEach(key -> {
 
             if (tree.get(key) == null) {
-                return ;
+                return;
             }
-            if("signature".equals(key)){ //签名串， 不参与签名
-                return ;
+            if ("signature".equals(key)) { //签名串， 不参与签名
+                return;
             }
 
             stringBuffer.append(key).append("=").append(tree.get(key).toString()).append("&");
@@ -176,25 +190,27 @@ public class YsfSignUtils {
     }
 
 
-    /** 将JSON中的数据转换成key1=value1&key2=value2的形式, 忽略空内容 和 signature字段 **/
+    /**
+     * 将JSON中的数据转换成key1=value1&key2=value2的形式, 忽略空内容 和 signature字段
+     **/
     private static String convertSignString(JSONObject params) {
         TreeMap<String, Object> tree = new TreeMap<>();
 
         //1. 所有参数进行排序
-        params.keySet().stream().forEach( key -> tree.put(key, params.get(key)));
+        params.keySet().stream().forEach(key -> tree.put(key, params.get(key)));
 
         //2. 拼接为 key=value&形式
         StringBuffer stringBuffer = new StringBuffer();
-        tree.keySet().stream().forEach( key -> {
+        tree.keySet().stream().forEach(key -> {
 
             if (tree.get(key) == null) {
-                return ;
+                return;
             }
-            if(StringUtils.isAnyEmpty(key, tree.get(key).toString())){ //空值， 不参与签名
-                return ;
+            if (StringUtils.isAnyEmpty(key, tree.get(key).toString())) { //空值， 不参与签名
+                return;
             }
-            if("signature".equals(key)){ //签名串， 不参与签名
-                return ;
+            if ("signature".equals(key)) { //签名串， 不参与签名
+                return;
             }
 
             stringBuffer.append(key).append("=").append(tree.get(key).toString()).append("&");
@@ -205,22 +221,24 @@ public class YsfSignUtils {
     }
 
 
-    /**  进件回调  将JSON中的数据转换成key1=value1&key2=value2的形式，忽略null内容【空串也参与签名】 和 signature字段* */
+    /**
+     * 进件回调  将JSON中的数据转换成key1=value1&key2=value2的形式，忽略null内容【空串也参与签名】 和 signature字段*
+     */
     private static String convertSignStringIncludeEmpty(JSONObject params) {
         TreeMap<String, Object> tree = new TreeMap<>();
 
         //1. 所有参数进行排序
-        params.keySet().stream().forEach( key -> tree.put(key, params.get(key)));
+        params.keySet().stream().forEach(key -> tree.put(key, params.get(key)));
 
         //2. 拼接为 key=value&形式
         StringBuffer stringBuffer = new StringBuffer();
-        tree.keySet().stream().forEach( key -> {
+        tree.keySet().stream().forEach(key -> {
 
             if (tree.get(key) == null) {
-                return ;
+                return;
             }
-            if("signature".equals(key)){ //签名串， 不参与签名
-                return ;
+            if ("signature".equals(key)) { //签名串， 不参与签名
+                return;
             }
 
             stringBuffer.append(key).append("=").append(tree.get(key).toString()).append("&");
@@ -231,7 +249,9 @@ public class YsfSignUtils {
     }
 
 
-    /** 通过SHA256进行摘要并转16进制  **/
+    /**
+     * 通过SHA256进行摘要并转16进制
+     **/
     private static byte[] sha256X16(String data, String encoding) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.reset();
@@ -249,14 +269,16 @@ public class YsfSignUtils {
         return sha256StrBuff.toString().toLowerCase().getBytes(encoding);
     }
 
-    /** 获取证书私钥 **/
+    /**
+     * 获取证书私钥
+     **/
     private static PrivateKey getSignCertPrivateKey(String pfxkeyfile, String keypwd) {
         FileInputStream fis = null;
 
         try {
             KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE_PKCS12, KEYSTORE_PROVIDER_BC);
             fis = new FileInputStream(pfxkeyfile);
-            char[] nPassword = null == keypwd || "".equals(keypwd.trim()) ? null: keypwd.toCharArray();
+            char[] nPassword = null == keypwd || "".equals(keypwd.trim()) ? null : keypwd.toCharArray();
             if (null != keyStore) {
                 keyStore.load(fis, nPassword);
             }
@@ -270,8 +292,8 @@ public class YsfSignUtils {
         } catch (Exception e) {
             logger.error("获取证书私钥失败！", e);
             return null;
-        }finally {
-            if(null!=fis) {
+        } finally {
+            if (null != fis) {
                 try {
                     fis.close();
                 } catch (IOException e) {

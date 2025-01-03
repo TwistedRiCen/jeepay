@@ -17,7 +17,6 @@ package com.jeequan.jeepay.pay.channel.wxpay;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.jeequan.jeepay.core.constants.CS;
@@ -26,22 +25,22 @@ import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.core.model.params.wxpay.WxpayIsvsubMchParams;
 import com.jeequan.jeepay.pay.channel.AbstractPaymentService;
 import com.jeequan.jeepay.pay.channel.wxpay.model.WxpayV3OrderRequestModel;
+import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.model.WxServiceWrapper;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
 import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
 import com.jeequan.jeepay.pay.util.PaywayUtil;
-import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 /*
-* 支付接口： 微信官方
-* 支付方式： 自适应
-*
-* @author zhuxiao
-* @site https://www.jeequan.com
-* @date 2021/6/8 18:10
-*/
+ * 支付接口： 微信官方
+ * 支付方式： 自适应
+ *
+ * @author zhuxiao
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 18:10
+ */
 @Service
 public class WxpayPaymentService extends AbstractPaymentService {
 
@@ -80,6 +79,7 @@ public class WxpayPaymentService extends AbstractPaymentService {
 
     /**
      * 构建微信统一下单请求数据
+     *
      * @param payOrder
      * @return
      */
@@ -95,16 +95,16 @@ public class WxpayPaymentService extends AbstractPaymentService {
         request.setTotalFee(payOrder.getAmount().intValue());
         request.setSpbillCreateIp(payOrder.getClientIp());
         request.setNotifyUrl(getNotifyUrl());
-        request.setProductId(System.currentTimeMillis()+"");
+        request.setProductId(System.currentTimeMillis() + "");
         request.setTimeExpire(DateUtil.format(payOrder.getExpiredTime(), DatePattern.PURE_DATETIME_PATTERN));
 
         //订单分账， 将冻结商户资金。
-        if(isDivisionOrder(payOrder)){
+        if (isDivisionOrder(payOrder)) {
             request.setProfitSharing("Y");
         }
 
         // 特约商户
-        if(mchAppConfigContext.isIsvsubMch()){
+        if (mchAppConfigContext.isIsvsubMch()) {
             WxpayIsvsubMchParams isvsubMchParams = (WxpayIsvsubMchParams) configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
             request.setSubMchId(isvsubMchParams.getSubMchId());
             if (StringUtils.isNotBlank(isvsubMchParams.getSubMchAppId())) {
@@ -117,9 +117,10 @@ public class WxpayPaymentService extends AbstractPaymentService {
 
     /**
      * 构建微信APIV3接口  统一下单请求数据
-     * @author terrfly
+     *
      * @param payOrder
      * @return
+     * @author terrfly
      */
     public WxpayV3OrderRequestModel buildV3OrderRequestModel(PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
 
@@ -143,13 +144,13 @@ public class WxpayPaymentService extends AbstractPaymentService {
         result.setSceneInfo(new WxpayV3OrderRequestModel.SceneInfo().setPayerClientIp(payOrder.getClientIp()));
 
         //订单分账， 将冻结商户资金。
-        if(isDivisionOrder(payOrder)){
+        if (isDivisionOrder(payOrder)) {
             result.setSettleInfo(new WxpayV3OrderRequestModel.SettleInfo().setProfitSharing(true));
         }
 
         WxPayService wxPayService = configContextQueryService.getWxServiceWrapper(mchAppConfigContext).getWxPayService();
 
-        if(mchAppConfigContext.isIsvsubMch()){ // 特约商户
+        if (mchAppConfigContext.isIsvsubMch()) { // 特约商户
 
             WxpayIsvsubMchParams isvsubMchParams = (WxpayIsvsubMchParams) configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
 
@@ -161,7 +162,7 @@ public class WxpayPaymentService extends AbstractPaymentService {
                 result.setSubAppid(isvsubMchParams.getSubMchAppId());
             }
 
-        }else { // 普通商户
+        } else { // 普通商户
 
             result.setNormalMchid(wxPayService.getConfig().getMchId());
             result.setNormalAppid(wxPayService.getConfig().getAppId());

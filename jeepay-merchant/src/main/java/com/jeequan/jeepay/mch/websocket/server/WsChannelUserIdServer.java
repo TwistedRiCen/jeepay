@@ -61,67 +61,9 @@ public class WsChannelUserIdServer {
     private String appId = "";
 
     /**
-     * 连接建立成功调用的方法
-     */
-    @OnOpen
-    public void onOpen(Session session, @PathParam("appId") String appId, @PathParam("cid") String cid) {
-
-        try {
-            //设置当前属性
-            this.cid = cid;
-            this.appId = appId;
-            this.session = session;
-
-            Set<WsChannelUserIdServer> wsServerSet = wsAppIdMap.get(appId);
-            if(wsServerSet == null) {
-                wsServerSet = new CopyOnWriteArraySet<>();
-            }
-            wsServerSet.add(this);
-            wsAppIdMap.put(appId, wsServerSet);
-
-            addOnlineCount(); //在线数加1
-            logger.info("cid[{}],appId[{}]连接开启监听！当前在线人数为{}", cid, appId, onlineClientSize);
-
-        } catch (Exception e) {
-            logger.error("ws监听异常cid[{}],appId[{}]", cid, appId, e);
-        }
-    }
-
-    /**
-     * 连接关闭调用的方法
-     */
-    @OnClose
-    public void onClose() {
-
-        Set wsSet = wsAppIdMap.get(this.appId);
-        wsSet.remove(this);
-        if(wsSet.isEmpty()) {
-            wsAppIdMap.remove(this.appId);
-        }
-
-        subOnlineCount(); //在线数减1
-        logger.info("cid[{}],appId[{}]连接关闭！当前在线人数为{}", cid, appId, onlineClientSize);
-    }
-
-    /**
-     * @param session
-     * @param error
-     */
-    @OnError
-    public void onError(Session session, Throwable error) {
-        logger.error("ws发生错误", error);
-    }
-
-    /**
-     * 实现服务器主动推送
-     */
-    public void sendMessage(String message) throws IOException {
-        this.session.getBasicRemote().sendText(message);
-    }
-
-    /**
      * 根据订单ID,推送消息
      * 捕捉所有的异常，避免影响业务。
+     *
      * @param appId
      */
     public static void sendMsgByAppAndCid(String appId, String cid, String msg) {
@@ -131,13 +73,13 @@ public class WsChannelUserIdServer {
 
 
             Set<WsChannelUserIdServer> wsSet = wsAppIdMap.get(appId);
-            if(wsSet == null || wsSet.isEmpty()){
+            if (wsSet == null || wsSet.isEmpty()) {
                 logger.info("appId[{}] 无ws监听客户端", appId);
-                return ;
+                return;
             }
 
             for (WsChannelUserIdServer item : wsSet) {
-                if(!cid.equals(item.cid)){
+                if (!cid.equals(item.cid)) {
                     continue;
                 }
                 try {
@@ -162,6 +104,65 @@ public class WsChannelUserIdServer {
 
     public static synchronized void subOnlineCount() {
         onlineClientSize--;
+    }
+
+    /**
+     * 连接建立成功调用的方法
+     */
+    @OnOpen
+    public void onOpen(Session session, @PathParam("appId") String appId, @PathParam("cid") String cid) {
+
+        try {
+            //设置当前属性
+            this.cid = cid;
+            this.appId = appId;
+            this.session = session;
+
+            Set<WsChannelUserIdServer> wsServerSet = wsAppIdMap.get(appId);
+            if (wsServerSet == null) {
+                wsServerSet = new CopyOnWriteArraySet<>();
+            }
+            wsServerSet.add(this);
+            wsAppIdMap.put(appId, wsServerSet);
+
+            addOnlineCount(); //在线数加1
+            logger.info("cid[{}],appId[{}]连接开启监听！当前在线人数为{}", cid, appId, onlineClientSize);
+
+        } catch (Exception e) {
+            logger.error("ws监听异常cid[{}],appId[{}]", cid, appId, e);
+        }
+    }
+
+    /**
+     * 连接关闭调用的方法
+     */
+    @OnClose
+    public void onClose() {
+
+        Set wsSet = wsAppIdMap.get(this.appId);
+        wsSet.remove(this);
+        if (wsSet.isEmpty()) {
+            wsAppIdMap.remove(this.appId);
+        }
+
+        subOnlineCount(); //在线数减1
+        logger.info("cid[{}],appId[{}]连接关闭！当前在线人数为{}", cid, appId, onlineClientSize);
+    }
+
+    /**
+     * @param session
+     * @param error
+     */
+    @OnError
+    public void onError(Session session, Throwable error) {
+        logger.error("ws发生错误", error);
+    }
+
+    /**
+     * 实现服务器主动推送
+     */
+    public void sendMessage(String message) throws IOException {
+        this.session.getBasicRemote().sendText(message);
     }
 
 }

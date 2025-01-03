@@ -47,7 +47,8 @@ import java.util.Map;
 @RequestMapping("api/mainChart")
 public class MainChartController extends CommonCtrl {
 
-    @Autowired private PayOrderService payOrderService;
+    @Autowired
+    private PayOrderService payOrderService;
 
     /**
      * @author: pangxiaoyu
@@ -59,7 +60,7 @@ public class MainChartController extends CommonCtrl {
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header")
     })
     @PreAuthorize("hasAuthority('ENT_C_MAIN_PAY_AMOUNT_WEEK')")
-    @RequestMapping(value="/payAmountWeek", method = RequestMethod.GET)
+    @RequestMapping(value = "/payAmountWeek", method = RequestMethod.GET)
     public ApiRes payAmountWeek() {
         return ApiRes.ok(payOrderService.mainPageWeekCount(null));
     }
@@ -74,7 +75,7 @@ public class MainChartController extends CommonCtrl {
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header")
     })
     @PreAuthorize("hasAuthority('ENT_C_MAIN_NUMBER_COUNT')")
-    @RequestMapping(value="/numCount", method = RequestMethod.GET)
+    @RequestMapping(value = "/numCount", method = RequestMethod.GET)
     public ApiRes numCount() {
         JSONObject json = payOrderService.mainPageNumCount(null);
         //返回数据
@@ -93,7 +94,7 @@ public class MainChartController extends CommonCtrl {
             @ApiImplicitParam(name = "createdEnd", value = "日期格式字符串（yyyy-MM-dd），时间范围查询--结束时间，须和开始时间一起使用，否则默认查最近七天（含今天）")
     })
     @PreAuthorize("hasAuthority('ENT_C_MAIN_PAY_COUNT')")
-    @RequestMapping(value="/payCount", method = RequestMethod.GET)
+    @RequestMapping(value = "/payCount", method = RequestMethod.GET)
     public ApiRes<List<Map>> payCount() {
         // 获取传入参数
         JSONObject paramJSON = getReqParamJSON();
@@ -116,7 +117,7 @@ public class MainChartController extends CommonCtrl {
             @ApiImplicitParam(name = "createdEnd", value = "日期格式字符串（yyyy-MM-dd），时间范围查询--结束时间，须和开始时间一起使用，否则默认查最近七天（含今天）")
     })
     @PreAuthorize("hasAuthority('ENT_C_MAIN_PAY_TYPE_COUNT')")
-    @RequestMapping(value="/payTypeCount", method = RequestMethod.GET)
+    @RequestMapping(value = "/payTypeCount", method = RequestMethod.GET)
     public ApiRes<ArrayList> payWayCount() {
         JSONObject paramJSON = getReqParamJSON();
         // 开始、结束时间

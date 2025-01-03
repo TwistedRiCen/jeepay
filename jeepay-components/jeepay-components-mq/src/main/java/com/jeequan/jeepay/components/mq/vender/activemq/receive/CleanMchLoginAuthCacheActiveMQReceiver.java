@@ -42,11 +42,13 @@ public class CleanMchLoginAuthCacheActiveMQReceiver implements IMQMsgReceiver {
     @Autowired
     private CleanMchLoginAuthCacheMQ.IMQReceiver mqReceiver;
 
-    /** 接收 【 queue 】 类型的消息 **/
+    /**
+     * 接收 【 queue 】 类型的消息
+     **/
     @Override
     @Async(MqThreadExecutor.EXECUTOR_PAYORDER_MCH_NOTIFY)
     @JmsListener(destination = CleanMchLoginAuthCacheMQ.MQ_NAME)
-    public void receiveMsg(String msg){
+    public void receiveMsg(String msg) {
         mqReceiver.receive(CleanMchLoginAuthCacheMQ.parse(msg));
     }
 

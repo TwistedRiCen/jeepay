@@ -29,8 +29,10 @@ import lombok.Data;
 @Data
 public class AliWapOrderRQ extends CommonPayDataRQ {
 
-    /** 构造函数 **/
-    public AliWapOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public AliWapOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.ALI_WAP); //默认 ALI_WAP, 避免validate出现问题
     }
 

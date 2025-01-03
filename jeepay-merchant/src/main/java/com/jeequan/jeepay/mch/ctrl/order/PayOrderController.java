@@ -45,7 +45,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,16 +67,20 @@ import java.util.Map;
 @RequestMapping("/api/payOrder")
 public class PayOrderController extends CommonCtrl {
 
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private PayWayService payWayService;
-    @Autowired private MchAppService mchAppService;
-    @Autowired private SysConfigService sysConfigService;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private PayWayService payWayService;
+    @Autowired
+    private MchAppService mchAppService;
+    @Autowired
+    private SysConfigService sysConfigService;
 
     /**
      * @Author: ZhuXiao
      * @Description: 订单信息列表
      * @Date: 10:43 2021/5/13
-    */
+     */
     @ApiOperation("支付订单信息列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -103,14 +111,14 @@ public class PayOrderController extends CommonCtrl {
         Map<String, String> payWayNameMap = new HashMap<>();
         List<PayWay> payWayList = payWayService.list();
         if (!CollectionUtils.isEmpty(payWayList)) {
-            for (PayWay payWay:payWayList) {
+            for (PayWay payWay : payWayList) {
                 payWayNameMap.put(payWay.getWayCode(), payWay.getWayName());
             }
-            for (PayOrder order:pages.getRecords()) {
+            for (PayOrder order : pages.getRecords()) {
                 // 存入支付方式名称
                 if (StringUtils.isNotEmpty(payWayNameMap.get(order.getWayCode()))) {
                     order.addExt("wayName", payWayNameMap.get(order.getWayCode()));
-                }else {
+                } else {
                     order.addExt("wayName", order.getWayCode());
                 }
             }
@@ -123,7 +131,7 @@ public class PayOrderController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 支付订单信息
      * @Date: 10:43 2021/5/13
-    */
+     */
     @ApiOperation("支付订单信息详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -145,6 +153,7 @@ public class PayOrderController extends CommonCtrl {
 
     /**
      * 发起订单退款
+     *
      * @author terrfly
      * @site https://www.jeequan.com
      * @date 2021/6/17 16:38
@@ -168,11 +177,11 @@ public class PayOrderController extends CommonCtrl {
             return ApiRes.fail(ApiCodeEnum.SYS_OPERATION_FAIL_SELETE);
         }
 
-        if(payOrder.getState() != PayOrder.STATE_SUCCESS){
+        if (payOrder.getState() != PayOrder.STATE_SUCCESS) {
             throw new BizException("订单状态不正确");
         }
 
-        if(payOrder.getRefundAmount() + refundAmount > payOrder.getAmount()){
+        if (payOrder.getRefundAmount() + refundAmount > payOrder.getAmount()) {
             throw new BizException("退款金额超过订单可退款金额！");
         }
 
@@ -195,7 +204,7 @@ public class PayOrderController extends CommonCtrl {
 
         try {
             RefundOrderCreateResponse response = jeepayClient.execute(request);
-            if(response.getCode() != 0){
+            if (response.getCode() != 0) {
                 throw new BizException(response.getMsg());
             }
             return ApiRes.ok(response.get());

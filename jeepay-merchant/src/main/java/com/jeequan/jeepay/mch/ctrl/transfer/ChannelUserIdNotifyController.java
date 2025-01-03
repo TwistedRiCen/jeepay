@@ -26,12 +26,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
-* 获取用户ID - 回调函数
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/8/13 17:54
-*/
+ * 获取用户ID - 回调函数
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/8/13 17:54
+ */
 @Api(tags = "商户转账")
 @Controller
 @RequestMapping("/api/anon/channelUserIdCallback")

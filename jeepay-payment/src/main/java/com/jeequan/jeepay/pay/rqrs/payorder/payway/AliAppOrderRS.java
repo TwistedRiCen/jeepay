@@ -32,12 +32,12 @@ public class AliAppOrderRS extends UnifiedOrderRS {
     private String payData;
 
     @Override
-    public String buildPayDataType(){
+    public String buildPayDataType() {
         return CS.PAY_DATA_TYPE.ALI_APP;
     }
 
     @Override
-    public String buildPayData(){
+    public String buildPayData() {
         return payData;
     }
 

@@ -37,20 +37,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
-* 转账订单api
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/8/13 10:52
-*/
+ * 转账订单api
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/8/13 10:52
+ */
 @Api(tags = "订单管理（转账类）")
 @RestController
 @RequestMapping("/api/transferOrders")
 public class TransferOrderController extends CommonCtrl {
 
-    @Autowired private TransferOrderService transferOrderService;
+    @Autowired
+    private TransferOrderService transferOrderService;
 
-    /** list **/
+    /**
+     * list
+     **/
     @ApiOperation("转账订单信息列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -63,7 +66,7 @@ public class TransferOrderController extends CommonCtrl {
             @ApiImplicitParam(name = "state", value = "支付状态: 0-订单生成, 1-转账中, 2-转账成功, 3-转账失败, 4-订单关闭", dataType = "Byte")
     })
     @PreAuthorize("hasAuthority('ENT_TRANSFER_ORDER_LIST')")
-    @RequestMapping(value="", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ApiPageRes<TransferOrder> list() {
 
         TransferOrder transferOrder = getObject(TransferOrder.class);
@@ -75,14 +78,16 @@ public class TransferOrderController extends CommonCtrl {
         return ApiPageRes.pages(pages);
     }
 
-    /** detail **/
+    /**
+     * detail
+     **/
     @ApiOperation("转账订单信息详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
             @ApiImplicitParam(name = "recordId", value = "转账订单号", required = true)
     })
     @PreAuthorize("hasAuthority('ENT_TRANSFER_ORDER_VIEW')")
-    @RequestMapping(value="/{recordId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{recordId}", method = RequestMethod.GET)
     public ApiRes detail(@PathVariable("recordId") String transferId) {
         TransferOrder refundOrder = transferOrderService.queryMchOrder(getCurrentMchNo(), null, transferId);
         if (refundOrder == null) {

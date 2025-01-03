@@ -30,7 +30,7 @@ public abstract class NormalMchParams {
     public static NormalMchParams factory(String ifCode, String paramsStr) {
 
         try {
-            return (NormalMchParams)JSONObject.parseObject(paramsStr, Class.forName(NormalMchParams.class.getPackage().getName() +"."+ ifCode +"."+ StrUtil.upperFirst(ifCode) +"NormalMchParams"));
+            return (NormalMchParams) JSONObject.parseObject(paramsStr, Class.forName(NormalMchParams.class.getPackage().getName() + "." + ifCode + "." + StrUtil.upperFirst(ifCode) + "NormalMchParams"));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -38,7 +38,7 @@ public abstract class NormalMchParams {
     }
 
     /**
-     *  敏感数据脱敏
+     * 敏感数据脱敏
      */
     public abstract String deSenData();
 

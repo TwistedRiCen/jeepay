@@ -23,12 +23,12 @@ import org.springframework.beans.BeanUtils;
 import java.math.BigDecimal;
 
 /*
-* 绑定账户 响应参数
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:34
-*/
+ * 绑定账户 响应参数
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:34
+ */
 @Data
 public class DivisionReceiverBindRS extends AbstractRS {
 
@@ -120,10 +120,9 @@ public class DivisionReceiverBindRS extends AbstractRS {
     private String errMsg;
 
 
+    public static DivisionReceiverBindRS buildByRecord(MchDivisionReceiver record) {
 
-    public static DivisionReceiverBindRS buildByRecord(MchDivisionReceiver record){
-
-        if(record == null){
+        if (record == null) {
             return null;
         }
 
@@ -133,7 +132,6 @@ public class DivisionReceiverBindRS extends AbstractRS {
 
         return result;
     }
-
 
 
 }

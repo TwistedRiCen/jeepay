@@ -29,13 +29,24 @@ import com.jeequan.jeepay.core.entity.IsvInfo;
 import com.jeequan.jeepay.core.entity.MchInfo;
 import com.jeequan.jeepay.core.entity.PayOrder;
 import com.jeequan.jeepay.core.entity.PayWay;
-import com.jeequan.jeepay.service.mapper.*;
+import com.jeequan.jeepay.service.mapper.IsvInfoMapper;
+import com.jeequan.jeepay.service.mapper.MchInfoMapper;
+import com.jeequan.jeepay.service.mapper.PayOrderDivisionRecordMapper;
+import com.jeequan.jeepay.service.mapper.PayOrderMapper;
+import com.jeequan.jeepay.service.mapper.PayWayMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -48,14 +59,21 @@ import java.util.*;
 @Service
 public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
 
-    @Autowired private PayOrderMapper payOrderMapper;
-    @Autowired private MchInfoMapper mchInfoMapper;
-    @Autowired private IsvInfoMapper isvInfoMapper;
-    @Autowired private PayWayMapper payWayMapper;
-    @Autowired private PayOrderDivisionRecordMapper payOrderDivisionRecordMapper;
+    @Autowired
+    private PayOrderMapper payOrderMapper;
+    @Autowired
+    private MchInfoMapper mchInfoMapper;
+    @Autowired
+    private IsvInfoMapper isvInfoMapper;
+    @Autowired
+    private PayWayMapper payWayMapper;
+    @Autowired
+    private PayOrderDivisionRecordMapper payOrderDivisionRecordMapper;
 
-    /** 更新订单状态  【订单生成】 --》 【支付中】 **/
-    public boolean updateInit2Ing(String payOrderId, PayOrder payOrder){
+    /**
+     * 更新订单状态  【订单生成】 --》 【支付中】
+     **/
+    public boolean updateInit2Ing(String payOrderId, PayOrder payOrder) {
 
         PayOrder updateRecord = new PayOrder();
         updateRecord.setState(PayOrder.STATE_ING);
@@ -72,8 +90,10 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
                 .eq(PayOrder::getPayOrderId, payOrderId).eq(PayOrder::getState, PayOrder.STATE_INIT));
     }
 
-    /** 更新订单状态  【支付中】 --》 【支付成功】 **/
-    public boolean updateIng2Success(String payOrderId, String channelOrderNo, String channelUserId){
+    /**
+     * 更新订单状态  【支付中】 --》 【支付成功】
+     **/
+    public boolean updateIng2Success(String payOrderId, String channelOrderNo, String channelUserId) {
 
         PayOrder updateRecord = new PayOrder();
         updateRecord.setState(PayOrder.STATE_SUCCESS);
@@ -85,8 +105,10 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
                 .eq(PayOrder::getPayOrderId, payOrderId).eq(PayOrder::getState, PayOrder.STATE_ING));
     }
 
-    /** 更新订单状态  【支付中】 --》 【订单关闭】 **/
-    public boolean updateIng2Close(String payOrderId){
+    /**
+     * 更新订单状态  【支付中】 --》 【订单关闭】
+     **/
+    public boolean updateIng2Close(String payOrderId) {
 
         PayOrder updateRecord = new PayOrder();
         updateRecord.setState(PayOrder.STATE_CLOSED);
@@ -95,8 +117,10 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
                 .eq(PayOrder::getPayOrderId, payOrderId).eq(PayOrder::getState, PayOrder.STATE_ING));
     }
 
-    /** 更新订单状态  【订单生成】 --》 【订单关闭】 **/
-    public boolean updateInit2Close(String payOrderId){
+    /**
+     * 更新订单状态  【订单生成】 --》 【订单关闭】
+     **/
+    public boolean updateInit2Close(String payOrderId) {
 
         PayOrder updateRecord = new PayOrder();
         updateRecord.setState(PayOrder.STATE_CLOSED);
@@ -106,8 +130,10 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
     }
 
 
-    /** 更新订单状态  【支付中】 --》 【支付失败】 **/
-    public boolean updateIng2Fail(String payOrderId, String channelOrderNo, String channelUserId, String channelErrCode, String channelErrMsg){
+    /**
+     * 更新订单状态  【支付中】 --》 【支付失败】
+     **/
+    public boolean updateIng2Fail(String payOrderId, String channelOrderNo, String channelUserId, String channelErrCode, String channelErrMsg) {
 
         PayOrder updateRecord = new PayOrder();
         updateRecord.setState(PayOrder.STATE_FAIL);
@@ -121,27 +147,31 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
     }
 
 
-    /** 更新订单状态  【支付中】 --》 【支付成功/支付失败】 **/
-    public boolean updateIng2SuccessOrFail(String payOrderId, Byte updateState, String channelOrderNo, String channelUserId, String channelErrCode, String channelErrMsg){
+    /**
+     * 更新订单状态  【支付中】 --》 【支付成功/支付失败】
+     **/
+    public boolean updateIng2SuccessOrFail(String payOrderId, Byte updateState, String channelOrderNo, String channelUserId, String channelErrCode, String channelErrMsg) {
 
-        if(updateState == PayOrder.STATE_ING){
+        if (updateState == PayOrder.STATE_ING) {
             return true;
-        }else if(updateState == PayOrder.STATE_SUCCESS){
+        } else if (updateState == PayOrder.STATE_SUCCESS) {
             return updateIng2Success(payOrderId, channelOrderNo, channelUserId);
-        }else if(updateState == PayOrder.STATE_FAIL){
+        } else if (updateState == PayOrder.STATE_FAIL) {
             return updateIng2Fail(payOrderId, channelOrderNo, channelUserId, channelErrCode, channelErrMsg);
         }
         return false;
     }
 
-    /** 查询商户订单 **/
-    public PayOrder queryMchOrder(String mchNo, String payOrderId, String mchOrderNo){
+    /**
+     * 查询商户订单
+     **/
+    public PayOrder queryMchOrder(String mchNo, String payOrderId, String mchOrderNo) {
 
-        if(StringUtils.isNotEmpty(payOrderId)){
+        if (StringUtils.isNotEmpty(payOrderId)) {
             return getOne(PayOrder.gw().eq(PayOrder::getMchNo, mchNo).eq(PayOrder::getPayOrderId, payOrderId));
-        }else if(StringUtils.isNotEmpty(mchOrderNo)){
+        } else if (StringUtils.isNotEmpty(mchOrderNo)) {
             return getOne(PayOrder.gw().eq(PayOrder::getMchNo, mchNo).eq(PayOrder::getMchOrderNo, mchOrderNo));
-        }else{
+        } else {
             return null;
         }
     }
@@ -187,8 +217,10 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
         return payOrderMapper.payTypeCount(param);
     }
 
-    /** 更新订单为 超时状态 **/
-    public Integer updateOrderExpired(){
+    /**
+     * 更新订单为 超时状态
+     **/
+    public Integer updateOrderExpired() {
 
         PayOrder payOrder = new PayOrder();
         payOrder.setState(PayOrder.STATE_CLOSED);
@@ -200,26 +232,30 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
         );
     }
 
-    /** 更新订单 通知状态 --> 已发送 **/
-    public int updateNotifySent(String payOrderId){
+    /**
+     * 更新订单 通知状态 --> 已发送
+     **/
+    public int updateNotifySent(String payOrderId) {
         PayOrder payOrder = new PayOrder();
         payOrder.setNotifyState(CS.YES);
         payOrder.setPayOrderId(payOrderId);
         return baseMapper.updateById(payOrder);
     }
 
-    /** 首页支付周统计 **/
+    /**
+     * 首页支付周统计
+     **/
     public JSONObject mainPageWeekCount(String mchNo) {
         JSONObject json = new JSONObject();
         Map dayAmount = new LinkedHashMap();
         ArrayList array = new ArrayList<>();
         BigDecimal payAmount = new BigDecimal(0);    // 当日金额
-        BigDecimal payWeek  = payAmount;   // 周总收益
+        BigDecimal payWeek = payAmount;   // 周总收益
         String todayAmount = "0.00";    // 今日金额
         String todayPayCount = "0";    // 今日交易笔数
         String yesterdayAmount = "0.00";    // 昨日金额
         Date today = new Date();
-        for(int i = 0 ; i < 7 ; i++){
+        for (int i = 0; i < 7; i++) {
             Date date = DateUtil.offsetDay(today, -i).toJdkDate();
             String dayStart = DateUtil.beginOfDay(date).toString(DatePattern.NORM_DATETIME_MINUTE_PATTERN);
             String dayEnd = DateUtil.endOfDay(date).toString(DatePattern.NORM_DATETIME_MINUTE_PATTERN);
@@ -249,7 +285,9 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
         return json;
     }
 
-    /** 首页统计总数量 **/
+    /**
+     * 首页统计总数量
+     **/
     public JSONObject mainPageNumCount(String mchNo) {
         JSONObject json = new JSONObject();
         // 商户总数
@@ -265,7 +303,9 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
         return json;
     }
 
-    /** 首页支付统计 **/
+    /**
+     * 首页支付统计
+     **/
     public List<Map> mainPagePayCount(String mchNo, String createdStart, String createdEnd) {
         Map param = new HashMap<>(); // 条件参数
         int daySpace = 6; // 默认最近七天（含当天）
@@ -294,14 +334,16 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
         return returnList;
     }
 
-    /** 首页支付类型统计 **/
+    /**
+     * 首页支付类型统计
+     **/
     public ArrayList mainPagePayTypeCount(String mchNo, String createdStart, String createdEnd) {
         // 返回数据列
         ArrayList array = new ArrayList<>();
         if (StringUtils.isNotEmpty(createdStart) && StringUtils.isNotEmpty(createdEnd)) {
             createdStart = createdStart + " 00:00:00";
             createdEnd = createdEnd + " 23:59:59";
-        }else {
+        } else {
             Date endDay = new Date();    // 当前日期
             Date startDay = DateUtil.lastWeek().toJdkDate(); // 一周前日期
             String end = DateUtil.formatDate(endDay);
@@ -315,14 +357,14 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
         // 得到所有支付方式
         Map<String, String> payWayNameMap = new HashMap<>();
         List<PayWay> payWayList = payWayMapper.selectList(PayWay.gw());
-        for (PayWay payWay:payWayList) {
+        for (PayWay payWay : payWayList) {
             payWayNameMap.put(payWay.getWayCode(), payWay.getWayName());
         }
         // 支付方式名称标注
-        for (Map payCount:payCountMap) {
+        for (Map payCount : payCountMap) {
             if (StringUtils.isNotEmpty(payWayNameMap.get(payCount.get("wayCode")))) {
                 payCount.put("typeName", payWayNameMap.get(payCount.get("wayCode")));
-            }else {
+            } else {
                 payCount.put("typeName", payCount.get("wayCode"));
             }
         }
@@ -330,12 +372,14 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
         return array;
     }
 
-    /** 生成首页交易统计数据类型 **/
+    /**
+     * 生成首页交易统计数据类型
+     **/
     public List<Map> getReturnList(int daySpace, String createdStart, List<Map> payOrderList, List<Map> refundOrderList) {
         List<Map> dayList = new ArrayList<>();
         DateTime endDay = DateUtil.parseDateTime(createdStart);
         // 先判断间隔天数 根据天数设置空的list
-        for (int i = 0; i <= daySpace ; i++) {
+        for (int i = 0; i <= daySpace; i++) {
             Map<String, String> map = new HashMap<>();
             map.put("date", DateUtil.format(DateUtil.offsetDay(endDay, -i), "MM-dd"));
             dayList.add(map);
@@ -345,7 +389,7 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
 
         List<Map> payListMap = new ArrayList<>(); // 收款的列
         List<Map> refundListMap = new ArrayList<>(); // 退款的列
-        for (Map dayMap:dayList) {
+        for (Map dayMap : dayList) {
             // 为收款列和退款列赋值默认参数【payAmount字段切记不可为string，否则前端图表解析不出来】
             Map<String, Object> payMap = new HashMap<>();
             payMap.put("date", dayMap.get("date").toString());
@@ -356,13 +400,13 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
             refundMap.put("date", dayMap.get("date").toString());
             refundMap.put("type", "退款");
             refundMap.put("payAmount", 0);
-            for (Map payOrderMap:payOrderList) {
+            for (Map payOrderMap : payOrderList) {
                 if (dayMap.get("date").equals(payOrderMap.get("groupDate"))) {
                     payMap.put("payAmount", payOrderMap.get("payAmount"));
                 }
             }
             payListMap.add(payMap);
-            for (Map refundOrderMap:refundOrderList) {
+            for (Map refundOrderMap : refundOrderList) {
                 if (dayMap.get("date").equals(refundOrderMap.get("groupDate"))) {
                     refundMap.put("payAmount", refundOrderMap.get("refundAmount"));
                 }
@@ -375,13 +419,14 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
 
 
     /**
-    *  计算支付订单商家入账金额
-    * 商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）
-    * @author terrfly
-    * @site https://www.jeequan.com
-    * @date 2021/8/26 16:39
-    */
-    public Long calMchIncomeAmount(PayOrder dbPayOrder){
+     * 计算支付订单商家入账金额
+     * 商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）
+     *
+     * @author terrfly
+     * @site https://www.jeequan.com
+     * @date 2021/8/26 16:39
+     */
+    public Long calMchIncomeAmount(PayOrder dbPayOrder) {
 
         //商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）
         Long mchIncomeAmount = dbPayOrder.getAmount() - dbPayOrder.getMchFeeAmount() - dbPayOrder.getRefundAmount();
@@ -395,6 +440,7 @@ public class PayOrderService extends ServiceImpl<PayOrderMapper, PayOrder> {
 
     /**
      * 通用列表查询条件
+     *
      * @param iPage
      * @param payOrder
      * @param paramJSON

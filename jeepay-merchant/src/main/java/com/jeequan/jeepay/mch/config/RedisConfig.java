@@ -48,7 +48,9 @@ public class RedisConfig {
     @Value("${spring.redis.password}")
     private String password;
 
-    /** 当前系统的redis缓存操作对象 (主对象) **/
+    /**
+     * 当前系统的redis缓存操作对象 (主对象)
+     **/
     @Primary
     @Bean(name = "defaultStringRedisTemplate")
     public StringRedisTemplate sysStringRedisTemplate() {

@@ -15,8 +15,8 @@
  */
 package com.jeequan.jeepay.mgr.ctrl.common;
 
-import com.jeequan.jeepay.mgr.ctrl.CommonCtrl;
 import com.jeequan.jeepay.components.oss.config.OssYmlConfig;
+import com.jeequan.jeepay.mgr.ctrl.CommonCtrl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -31,18 +31,21 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /*
-* 静态文件下载/预览 ctrl
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:08
-*/
+ * 静态文件下载/预览 ctrl
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:08
+ */
 @Controller
 public class StaticController extends CommonCtrl {
 
-    @Autowired private OssYmlConfig ossYmlConfig;
+    @Autowired
+    private OssYmlConfig ossYmlConfig;
 
-    /** 图片预览 **/
+    /**
+     * 图片预览
+     **/
     @GetMapping("/api/anon/localOssFiles/**/*.*")
     public ResponseEntity<?> imgView() {
 
@@ -50,7 +53,7 @@ public class StaticController extends CommonCtrl {
 
             //查找图片文件
             File imgFile = new File(ossYmlConfig.getOss().getFilePublicPath() + File.separator + request.getRequestURI().substring(24));
-            if(!imgFile.isFile() || !imgFile.exists()) {
+            if (!imgFile.isFile() || !imgFile.exists()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 

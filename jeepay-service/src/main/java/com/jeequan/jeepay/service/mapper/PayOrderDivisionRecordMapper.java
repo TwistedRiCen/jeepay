@@ -16,10 +16,14 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface PayOrderDivisionRecordMapper extends BaseMapper<PayOrderDivisionRecord> {
 
-    /** 查询全部分账成功金额 **/
+    /**
+     * 查询全部分账成功金额
+     **/
     Long sumSuccessDivisionAmount(String payOrderId);
 
-    /**  batch_order_id 去重， 查询出所有的 分账已受理状态的订单， 支持分页。 */
+    /**
+     * batch_order_id 去重， 查询出所有的 分账已受理状态的订单， 支持分页。
+     */
     IPage<PayOrderDivisionRecord> distinctBatchOrderIdList(IPage<?> page, @Param("ew") Wrapper<PayOrderDivisionRecord> wrapper);
 
 }

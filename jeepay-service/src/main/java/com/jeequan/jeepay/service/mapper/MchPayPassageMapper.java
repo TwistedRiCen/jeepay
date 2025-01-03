@@ -32,6 +32,8 @@ import java.util.Map;
  */
 public interface MchPayPassageMapper extends BaseMapper<MchPayPassage> {
 
-    /** 根据支付方式查询可用的支付接口列表 **/
+    /**
+     * 根据支付方式查询可用的支付接口列表
+     **/
     List<JSONObject> selectAvailablePayInterfaceList(Map params);
 }

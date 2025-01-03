@@ -25,13 +25,13 @@ import com.jeequan.jeepay.pay.util.PaywayUtil;
 import org.springframework.stereotype.Service;
 
 /*
-* 支付接口： 支付宝官方
-* 支付方式： 自适应
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:19
-*/
+ * 支付接口： 支付宝官方
+ * 支付方式： 自适应
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:19
+ */
 @Service
 public class AlipayPaymentService extends AbstractPaymentService {
 

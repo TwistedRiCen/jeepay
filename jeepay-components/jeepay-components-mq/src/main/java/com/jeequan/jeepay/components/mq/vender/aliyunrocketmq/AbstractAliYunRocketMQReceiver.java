@@ -1,6 +1,10 @@
 package com.jeequan.jeepay.components.mq.vender.aliyunrocketmq;
 
-import com.aliyun.openservices.ons.api.*;
+import com.aliyun.openservices.ons.api.Action;
+import com.aliyun.openservices.ons.api.ConsumeContext;
+import com.aliyun.openservices.ons.api.Consumer;
+import com.aliyun.openservices.ons.api.Message;
+import com.aliyun.openservices.ons.api.MessageListener;
 import com.jeequan.jeepay.components.mq.constant.MQSendTypeEnum;
 import com.jeequan.jeepay.components.mq.vender.IMQMsgReceiver;
 import lombok.extern.slf4j.Slf4j;

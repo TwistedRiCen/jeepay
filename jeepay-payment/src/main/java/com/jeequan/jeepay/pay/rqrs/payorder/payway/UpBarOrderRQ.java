@@ -31,12 +31,16 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UpBarOrderRQ extends CommonPayDataRQ {
 
-    /** 用户 支付条码 **/
+    /**
+     * 用户 支付条码
+     **/
     @NotBlank(message = "支付条码不能为空")
     private String authCode;
 
-    /** 构造函数 **/
-    public UpBarOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public UpBarOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.UP_BAR);
     }
 

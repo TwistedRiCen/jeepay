@@ -1,7 +1,11 @@
 package com.gen;
 
 import com.baomidou.mybatisplus.generator.AutoGenerator;
-import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
+import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
+import com.baomidou.mybatisplus.generator.config.StrategyConfig;
+import com.baomidou.mybatisplus.generator.config.TemplateConfig;
 import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
@@ -10,12 +14,12 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import java.io.File;
 
 /*
-* 代码生成器
-*
-* @author terrfly
-* @site https://www.jeepay.vip
-* @date 2021/6/8 17:47
-*/
+ * 代码生成器
+ *
+ * @author terrfly
+ * @site https://www.jeepay.vip
+ * @date 2021/6/8 17:47
+ */
 public class MainGen {
 
     public static final String THIS_MODULE_NAME = "jeepay-z-codegen"; //当前项目名称
@@ -26,7 +30,7 @@ public class MainGen {
 
     // 多个用,  拼接
     //public static final String TABLE_NAMES= "t_sys_entitlement,t_sys_role,t_sys_user,t_sys_user_auth";
-    public static final String TABLE_NAMES= "t_pay_way";
+    public static final String TABLE_NAMES = "t_pay_way";
 
     public static void main(String[] args) {
 
@@ -37,7 +41,7 @@ public class MainGen {
         GlobalConfig gc = new GlobalConfig();
         String projectPath = System.getProperty("user.dir");  //获取当前项目的 文件夹地址
 
-        if(!projectPath.endsWith(THIS_MODULE_NAME)){  //解决IDEA中 项目目录问题
+        if (!projectPath.endsWith(THIS_MODULE_NAME)) {  //解决IDEA中 项目目录问题
             projectPath += File.separator + THIS_MODULE_NAME;
         }
 

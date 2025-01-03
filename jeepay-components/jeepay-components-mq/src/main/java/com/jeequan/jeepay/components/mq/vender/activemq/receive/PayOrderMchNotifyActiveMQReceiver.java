@@ -15,10 +15,10 @@
  */
 package com.jeequan.jeepay.components.mq.vender.activemq.receive;
 
+import com.jeequan.jeepay.components.mq.constant.MQVenderCS;
 import com.jeequan.jeepay.components.mq.executor.MqThreadExecutor;
 import com.jeequan.jeepay.components.mq.model.PayOrderMchNotifyMQ;
 import com.jeequan.jeepay.components.mq.vender.IMQMsgReceiver;
-import com.jeequan.jeepay.components.mq.constant.MQVenderCS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -42,11 +42,13 @@ public class PayOrderMchNotifyActiveMQReceiver implements IMQMsgReceiver {
     @Autowired
     private PayOrderMchNotifyMQ.IMQReceiver mqReceiver;
 
-    /** 接收 【 queue 】 类型的消息 **/
+    /**
+     * 接收 【 queue 】 类型的消息
+     **/
     @Override
     @Async(MqThreadExecutor.EXECUTOR_PAYORDER_MCH_NOTIFY)
     @JmsListener(destination = PayOrderMchNotifyMQ.MQ_NAME)
-    public void receiveMsg(String msg){
+    public void receiveMsg(String msg) {
         mqReceiver.receive(PayOrderMchNotifyMQ.parse(msg));
     }
 

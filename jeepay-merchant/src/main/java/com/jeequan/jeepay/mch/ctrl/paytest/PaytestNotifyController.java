@@ -32,18 +32,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 /*
-* 支付测试 - 回调函数
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/22 14:22
-*/
+ * 支付测试 - 回调函数
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/22 14:22
+ */
 @Api(tags = "支付测试")
 @RestController
 @RequestMapping("/api/anon/paytestNotify")
 public class PaytestNotifyController extends CommonCtrl {
 
-    @Autowired private MchAppService mchAppService;
+    @Autowired
+    private MchAppService mchAppService;
 
     @ApiOperation("支付回调信息")
     @ApiImplicitParams({
@@ -61,13 +62,13 @@ public class PaytestNotifyController extends CommonCtrl {
         String appId = params.getString("appId");
         String sign = params.getString("sign");
         MchApp mchApp = mchAppService.getById(appId);
-        if(mchApp == null || !mchApp.getMchNo().equals(mchNo)){
+        if (mchApp == null || !mchApp.getMchNo().equals(mchNo)) {
             response.getWriter().print("app is not exists");
             return;
         }
 
         params.remove("sign");
-        if(!JeepayKit.getSign(params, mchApp.getAppSecret()).equalsIgnoreCase(sign)){
+        if (!JeepayKit.getSign(params, mchApp.getAppSecret()).equalsIgnoreCase(sign)) {
             response.getWriter().print("sign fail");
             return;
         }

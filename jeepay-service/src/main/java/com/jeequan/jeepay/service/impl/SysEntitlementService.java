@@ -17,8 +17,8 @@ package com.jeequan.jeepay.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jeequan.jeepay.core.entity.SysEntitlement;
-import org.springframework.stereotype.Service;
 import com.jeequan.jeepay.service.mapper.SysEntitlementMapper;
+import org.springframework.stereotype.Service;
 
 /**
  * <p>
@@ -30,8 +30,6 @@ import com.jeequan.jeepay.service.mapper.SysEntitlementMapper;
  */
 @Service
 public class SysEntitlementService extends ServiceImpl<SysEntitlementMapper, SysEntitlement> {
-
-
 
 
 }

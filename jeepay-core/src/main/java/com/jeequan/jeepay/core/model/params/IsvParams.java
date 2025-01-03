@@ -28,10 +28,10 @@ import com.alibaba.fastjson.JSONObject;
  */
 public abstract class IsvParams {
 
-    public static IsvParams factory(String ifCode, String paramsStr){
+    public static IsvParams factory(String ifCode, String paramsStr) {
 
         try {
-            return (IsvParams)JSONObject.parseObject(paramsStr, Class.forName(IsvParams.class.getPackage().getName() +"."+ ifCode +"."+ StrUtil.upperFirst(ifCode) +"IsvParams"));
+            return (IsvParams) JSONObject.parseObject(paramsStr, Class.forName(IsvParams.class.getPackage().getName() + "." + ifCode + "." + StrUtil.upperFirst(ifCode) + "IsvParams"));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -39,8 +39,8 @@ public abstract class IsvParams {
     }
 
     /**
-     *  敏感数据脱敏
-    */
+     * 敏感数据脱敏
+     */
     public abstract String deSenData();
 
 }

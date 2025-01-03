@@ -36,12 +36,12 @@ import com.jeequan.jeepay.pay.util.ApiResBuilder;
 import org.springframework.stereotype.Service;
 
 /*
-* 支付宝 wap支付
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:21
-*/
+ * 支付宝 wap支付
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:21
+ */
 @Service("alipayPaymentByAliWapService") //Service Name需保持全局唯一性
 public class AliWap extends AlipayPaymentService {
 
@@ -51,9 +51,9 @@ public class AliWap extends AlipayPaymentService {
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext){
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
 
-        AliWapOrderRQ bizRQ = (AliWapOrderRQ)rq;
+        AliWapOrderRQ bizRQ = (AliWapOrderRQ) rq;
 
         AlipayTradeWapPayRequest req = new AlipayTradeWapPayRequest();
         AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
@@ -74,18 +74,18 @@ public class AliWap extends AlipayPaymentService {
         AliWapOrderRS res = ApiResBuilder.buildSuccess(AliWapOrderRS.class);
 
         try {
-            if(CS.PAY_DATA_TYPE.FORM.equals(bizRQ.getPayDataType())){ //表单方式
+            if (CS.PAY_DATA_TYPE.FORM.equals(bizRQ.getPayDataType())) { //表单方式
                 res.setFormContent(configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).getAlipayClient().pageExecute(req).getBody());
 
-            }else if (CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(bizRQ.getPayDataType())){ //二维码图片地址
+            } else if (CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(bizRQ.getPayDataType())) { //二维码图片地址
 
                 String payUrl = configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).getAlipayClient().pageExecute(req, "GET").getBody();
                 res.setCodeImgUrl(sysConfigService.getDBApplicationConfig().genScanImgUrl(payUrl));
-            }else{ // 默认都为 payUrl方式
+            } else { // 默认都为 payUrl方式
 
                 res.setPayUrl(configContextQueryService.getAlipayClientWrapper(mchAppConfigContext).getAlipayClient().pageExecute(req, "GET").getBody());
             }
-        }catch (AlipayApiException e) {
+        } catch (AlipayApiException e) {
             throw ChannelException.sysError(e.getMessage());
         }
 

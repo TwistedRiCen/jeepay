@@ -23,43 +23,63 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 /*
-* 支付宝 isv参数定义
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 16:34
-*/
+ * 支付宝 isv参数定义
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 16:34
+ */
 @Data
 public class AlipayIsvParams extends IsvParams {
 
-    /** 是否沙箱环境 */
+    /**
+     * 是否沙箱环境
+     */
     private Byte sandbox;
 
-    /** pid */
+    /**
+     * pid
+     */
     private String pid;
 
-    /** appId */
+    /**
+     * appId
+     */
     private String appId;
 
-    /** privateKey */
+    /**
+     * privateKey
+     */
     private String privateKey;
 
-    /** alipayPublicKey */
+    /**
+     * alipayPublicKey
+     */
     private String alipayPublicKey;
 
-    /** 签名方式 **/
+    /**
+     * 签名方式
+     **/
     private String signType;
 
-    /** 是否使用证书方式 **/
+    /**
+     * 是否使用证书方式
+     **/
     private Byte useCert;
 
-    /** app 证书 **/
+    /**
+     * app 证书
+     **/
     private String appPublicCert;
 
-    /** 支付宝公钥证书（.crt格式） **/
+    /**
+     * 支付宝公钥证书（.crt格式）
+     **/
     private String alipayPublicCert;
 
-    /** 支付宝根证书 **/
+    /**
+     * 支付宝根证书
+     **/
     private String alipayRootCert;
 
     @Override

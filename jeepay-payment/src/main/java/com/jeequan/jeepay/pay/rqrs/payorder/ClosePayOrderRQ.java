@@ -28,10 +28,14 @@ import lombok.Data;
 @Data
 public class ClosePayOrderRQ extends AbstractMchAppRQ {
 
-    /** 商户订单号 **/
+    /**
+     * 商户订单号
+     **/
     private String mchOrderNo;
 
-    /** 支付系统订单号 **/
+    /**
+     * 支付系统订单号
+     **/
     private String payOrderId;
 
 }

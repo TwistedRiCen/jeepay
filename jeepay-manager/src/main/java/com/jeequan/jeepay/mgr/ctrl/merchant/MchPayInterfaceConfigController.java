@@ -41,7 +41,11 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -58,17 +62,22 @@ import java.util.List;
 @RequestMapping("/api/mch/payConfigs")
 public class MchPayInterfaceConfigController extends CommonCtrl {
 
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
-    @Autowired private MchAppService mchAppService;
-    @Autowired private IMQSender mqSender;
-    @Autowired private MchInfoService mchInfoService;
-    @Autowired private SysConfigService sysConfigService;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private MchAppService mchAppService;
+    @Autowired
+    private IMQSender mqSender;
+    @Autowired
+    private MchInfoService mchInfoService;
+    @Autowired
+    private SysConfigService sysConfigService;
 
     /**
      * @Author: ZhuXiao
      * @Description: 查询应用支付接口配置列表
      * @Date: 15:50 2021/4/27
-    */
+     */
     @ApiOperation("查询应用支付接口配置列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -86,7 +95,7 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 根据 appId、接口类型 获取应用参数配置
      * @Date: 17:03 2021/4/27
-    */
+     */
     @ApiOperation("根据应用ID、接口类型 获取应用参数配置")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -124,7 +133,7 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: 应用支付接口配置
      * @Date: 16:13 2021/4/27
-    */
+     */
     @ApiOperation("更新应用支付参数")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -167,7 +176,7 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
 
             // 合并支付参数
             payInterfaceConfig.setIfParams(StringKit.marge(dbRecoed.getIfParams(), payInterfaceConfig.getIfParams()));
-        }else {
+        } else {
             payInterfaceConfig.setCreatedUid(userId);
             payInterfaceConfig.setCreatedBy(realName);
         }
@@ -184,8 +193,9 @@ public class MchPayInterfaceConfigController extends CommonCtrl {
     }
 
 
-
-    /** 查询支付宝商户授权URL **/
+    /**
+     * 查询支付宝商户授权URL
+     **/
     @ApiOperation("查询支付宝商户授权URL")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),

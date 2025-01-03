@@ -34,17 +34,18 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /*
-* 小新支付 查单接口实现类
-*
-* @author jmdhappy
-* @site https://www.jeequan.com
-* @date 2021/9/21 01:05
-*/
+ * 小新支付 查单接口实现类
+ *
+ * @author jmdhappy
+ * @site https://www.jeequan.com
+ * @date 2021/9/21 01:05
+ */
 @Service
 @Slf4j
 public class XxpayPayOrderQueryService implements IPayOrderQueryService {
 
-    @Autowired private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
 
     @Override
     public String getIfCode() {
@@ -52,9 +53,9 @@ public class XxpayPayOrderQueryService implements IPayOrderQueryService {
     }
 
     @Override
-    public ChannelRetMsg query(PayOrder payOrder, MchAppConfigContext mchAppConfigContext){
-        XxpayNormalMchParams xxpayParams = (XxpayNormalMchParams)configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
-        Map<String,Object> paramMap = new TreeMap();
+    public ChannelRetMsg query(PayOrder payOrder, MchAppConfigContext mchAppConfigContext) {
+        XxpayNormalMchParams xxpayParams = (XxpayNormalMchParams) configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+        Map<String, Object> paramMap = new TreeMap();
         // 接口类型
         paramMap.put("mchId", xxpayParams.getMchId());
         paramMap.put("mchOrderNo", payOrder.getPayOrderId());
@@ -69,16 +70,16 @@ public class XxpayPayOrderQueryService implements IPayOrderQueryService {
         } catch (Exception e) {
             log.error("http error", e);
         }
-        if(StringUtils.isEmpty(resStr)) {
+        if (StringUtils.isEmpty(resStr)) {
             return ChannelRetMsg.waiting(); //支付中
         }
         JSONObject resObj = JSONObject.parseObject(resStr);
-        if(!"0".equals(resObj.getString("retCode"))){
+        if (!"0".equals(resObj.getString("retCode"))) {
             return ChannelRetMsg.waiting(); //支付中
         }
         // 支付状态,0-订单生成,1-支付中,2-支付成功,3-业务处理完成
         String status = resObj.getString("status");
-        if("2".equals(status) || "3".equals(status)) {
+        if ("2".equals(status) || "3".equals(status)) {
             return ChannelRetMsg.confirmSuccess(resObj.getString("channelOrderNo"));  //支付成功
         }
         return ChannelRetMsg.waiting(); //支付中

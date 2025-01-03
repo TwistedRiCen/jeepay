@@ -29,8 +29,10 @@ import lombok.Data;
 @Data
 public class YsfJsapiOrderRQ extends UnifiedOrderRQ {
 
-    /** 构造函数 **/
-    public YsfJsapiOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public YsfJsapiOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.YSF_JSAPI);
     }
 

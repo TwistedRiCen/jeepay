@@ -32,31 +32,49 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class AlipayNormalMchParams extends NormalMchParams {
 
-    /** 是否沙箱环境 */
+    /**
+     * 是否沙箱环境
+     */
     private Byte sandbox;
 
-    /** appId */
+    /**
+     * appId
+     */
     private String appId;
 
-    /** privateKey */
+    /**
+     * privateKey
+     */
     private String privateKey;
 
-    /** alipayPublicKey */
+    /**
+     * alipayPublicKey
+     */
     private String alipayPublicKey;
 
-    /** 签名方式 **/
+    /**
+     * 签名方式
+     **/
     private String signType;
 
-    /** 是否使用证书方式 **/
+    /**
+     * 是否使用证书方式
+     **/
     private Byte useCert;
 
-    /** app 证书 **/
+    /**
+     * app 证书
+     **/
     private String appPublicCert;
 
-    /** 支付宝公钥证书（.crt格式） **/
+    /**
+     * 支付宝公钥证书（.crt格式）
+     **/
     private String alipayPublicCert;
 
-    /** 支付宝根证书 **/
+    /**
+     * 支付宝根证书
+     **/
     private String alipayRootCert;
 
     @Override

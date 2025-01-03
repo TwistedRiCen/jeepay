@@ -20,7 +20,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jeequan.jeepay.core.entity.PayOrder;
 import com.jeequan.jeepay.core.exception.BizException;
-import com.jeequan.jeepay.core.utils.DateKit;
 import com.jeequan.jeepay.pay.channel.ysfpay.YsfpayPaymentService;
 import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
@@ -48,7 +47,7 @@ public class AliJsapi extends YsfpayPaymentService {
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
 
         AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getBuyerUserId())){
+        if (StringUtils.isEmpty(bizRQ.getBuyerUserId())) {
             throw new BizException("[buyerUserId]不可为空");
         }
         return null;
@@ -80,18 +79,18 @@ public class AliJsapi extends YsfpayPaymentService {
         try {
 
             //00-交易成功， 02-用户支付中 , 12-交易重复， 需要发起查询处理    其他认为失败
-            if("00".equals(respCode)){
+            if ("00".equals(respCode)) {
                 //付款信息
                 JSONObject payDataJSON = JSON.parseObject(resJSON.getString("payData"));
                 String tradeNo = "";
 
-                if(StringUtils.isNotBlank(payDataJSON.getString("tradeNo"))){
+                if (StringUtils.isNotBlank(payDataJSON.getString("tradeNo"))) {
                     tradeNo = payDataJSON.getString("tradeNo");
-                }else{
+                } else {
                     String prepayId = payDataJSON.getString("prepayId");
-                    if(prepayId != null && prepayId.length() > 2 && !prepayId.startsWith(DateUtil.format(new Date(), "yyyy"))){
+                    if (prepayId != null && prepayId.length() > 2 && !prepayId.startsWith(DateUtil.format(new Date(), "yyyy"))) {
                         tradeNo = prepayId.substring(2);
-                    }else{
+                    } else {
                         tradeNo = prepayId;
                     }
                 }
@@ -99,7 +98,7 @@ public class AliJsapi extends YsfpayPaymentService {
                 res.setPayData(payDataJSON.toJSONString());
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             channelRetMsg.setChannelErrCode(respCode);
             channelRetMsg.setChannelErrMsg(respMsg);
         }

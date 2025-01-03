@@ -52,31 +52,45 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import static com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg.ChannelState.API_RET_ERROR;
+import static com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg.ChannelState.UNKNOWN;
+import static com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg.ChannelState.WAITING;
+
 /*
-* 创建支付订单抽象类
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:26
-*/
+ * 创建支付订单抽象类
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:26
+ */
 @Slf4j
 public abstract class AbstractPayOrderController extends ApiController {
 
-    @Autowired private MchPayPassageService mchPayPassageService;
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private ConfigContextQueryService configContextQueryService;
-    @Autowired private PayOrderProcessService payOrderProcessService;
-    @Autowired private SysConfigService sysConfigService;
-    @Autowired private IMQSender mqSender;
+    @Autowired
+    private MchPayPassageService mchPayPassageService;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private PayOrderProcessService payOrderProcessService;
+    @Autowired
+    private SysConfigService sysConfigService;
+    @Autowired
+    private IMQSender mqSender;
 
 
-    /** 统一下单 (新建订单模式) **/
-    protected ApiRes unifiedOrder(String wayCode, UnifiedOrderRQ bizRQ){
+    /**
+     * 统一下单 (新建订单模式)
+     **/
+    protected ApiRes unifiedOrder(String wayCode, UnifiedOrderRQ bizRQ) {
         return unifiedOrder(wayCode, bizRQ, null);
     }
 
-    /** 统一下单 **/
-    protected ApiRes unifiedOrder(String wayCode, UnifiedOrderRQ bizRQ, PayOrder payOrder){
+    /**
+     * 统一下单
+     **/
+    protected ApiRes unifiedOrder(String wayCode, UnifiedOrderRQ bizRQ, PayOrder payOrder) {
 
         // 响应数据
         UnifiedOrderRS bizRS = null;
@@ -86,9 +100,9 @@ public abstract class AbstractPayOrderController extends ApiController {
 
         try {
 
-            if(payOrder != null){ //当订单存在时，封装公共参数。
+            if (payOrder != null) { //当订单存在时，封装公共参数。
 
-                if(payOrder.getState() != PayOrder.STATE_INIT){
+                if (payOrder.getState() != PayOrder.STATE_INIT) {
                     throw new BizException("订单状态异常");
                 }
 
@@ -113,20 +127,20 @@ public abstract class AbstractPayOrderController extends ApiController {
             String appId = bizRQ.getAppId();
 
             // 只有新订单模式，进行校验
-            if(isNewOrder && payOrderService.count(PayOrder.gw().eq(PayOrder::getMchNo, mchNo).eq(PayOrder::getMchOrderNo, bizRQ.getMchOrderNo())) > 0){
-                throw new BizException("商户订单["+bizRQ.getMchOrderNo()+"]已存在");
+            if (isNewOrder && payOrderService.count(PayOrder.gw().eq(PayOrder::getMchNo, mchNo).eq(PayOrder::getMchOrderNo, bizRQ.getMchOrderNo())) > 0) {
+                throw new BizException("商户订单[" + bizRQ.getMchOrderNo() + "]已存在");
             }
 
-            if(StringUtils.isNotEmpty(bizRQ.getNotifyUrl()) && !StringKit.isAvailableUrl(bizRQ.getNotifyUrl())){
+            if (StringUtils.isNotEmpty(bizRQ.getNotifyUrl()) && !StringKit.isAvailableUrl(bizRQ.getNotifyUrl())) {
                 throw new BizException("异步通知地址协议仅支持http:// 或 https:// !");
             }
-            if(StringUtils.isNotEmpty(bizRQ.getReturnUrl()) && !StringKit.isAvailableUrl(bizRQ.getReturnUrl())){
+            if (StringUtils.isNotEmpty(bizRQ.getReturnUrl()) && !StringKit.isAvailableUrl(bizRQ.getReturnUrl())) {
                 throw new BizException("同步通知地址协议仅支持http:// 或 https:// !");
             }
 
             //获取支付参数 (缓存数据) 和 商户信息
             MchAppConfigContext mchAppConfigContext = configContextQueryService.queryMchInfoAndAppInfo(mchNo, appId);
-            if(mchAppConfigContext == null){
+            if (mchAppConfigContext == null) {
                 throw new BizException("获取商户应用信息失败");
             }
 
@@ -134,7 +148,7 @@ public abstract class AbstractPayOrderController extends ApiController {
             MchApp mchApp = mchAppConfigContext.getMchApp();
 
             //收银台支付并且只有新订单需要走这里，  收银台二次下单的wayCode应该为实际支付方式。
-            if(isNewOrder && CS.PAY_WAY_CODE.QR_CASHIER.equals(wayCode)){
+            if (isNewOrder && CS.PAY_WAY_CODE.QR_CASHIER.equals(wayCode)) {
 
                 //生成订单
                 payOrder = genPayOrder(bizRQ, mchInfo, mchApp, null, null);
@@ -143,15 +157,15 @@ public abstract class AbstractPayOrderController extends ApiController {
                 payOrderService.save(payOrder);
 
                 QrCashierOrderRS qrCashierOrderRS = new QrCashierOrderRS();
-                QrCashierOrderRQ qrCashierOrderRQ = (QrCashierOrderRQ)bizRQ;
+                QrCashierOrderRQ qrCashierOrderRQ = (QrCashierOrderRQ) bizRQ;
 
                 DBApplicationConfig dbApplicationConfig = sysConfigService.getDBApplicationConfig();
 
                 String payUrl = dbApplicationConfig.genUniJsapiPayUrl(payOrderId);
-                if(CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(qrCashierOrderRQ.getPayDataType())){ //二维码地址
+                if (CS.PAY_DATA_TYPE.CODE_IMG_URL.equals(qrCashierOrderRQ.getPayDataType())) { //二维码地址
                     qrCashierOrderRS.setCodeImgUrl(dbApplicationConfig.genScanImgUrl(payUrl));
 
-                }else{ //默认都为跳转地址方式
+                } else { //默认都为跳转地址方式
                     qrCashierOrderRS.setPayUrl(payUrl);
                 }
 
@@ -160,7 +174,7 @@ public abstract class AbstractPayOrderController extends ApiController {
 
             // 根据支付方式， 查询出 该商户 可用的支付接口
             MchPayPassage mchPayPassage = mchPayPassageService.findMchPayPassage(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), wayCode);
-            if(mchPayPassage == null){
+            if (mchPayPassage == null) {
                 throw new BizException("商户应用不支持该支付方式");
             }
 
@@ -169,9 +183,9 @@ public abstract class AbstractPayOrderController extends ApiController {
             String ifCode = paymentService.getIfCode();
 
             //生成订单
-            if(isNewOrder){
+            if (isNewOrder) {
                 payOrder = genPayOrder(bizRQ, mchInfo, mchApp, ifCode, mchPayPassage);
-            }else{
+            } else {
                 payOrder.setIfCode(ifCode);
 
                 // 查询支付方式的费率，并 在更新ing时更新费率信息
@@ -181,15 +195,15 @@ public abstract class AbstractPayOrderController extends ApiController {
 
             //预先校验
             String errMsg = paymentService.preCheck(bizRQ, payOrder);
-            if(StringUtils.isNotEmpty(errMsg)){
+            if (StringUtils.isNotEmpty(errMsg)) {
                 throw new BizException(errMsg);
             }
 
             String newPayOrderId = paymentService.customPayOrderId(bizRQ, payOrder, mchAppConfigContext);
 
 
-            if(isNewOrder){
-                if(StringUtils.isNotBlank(newPayOrderId)){ // 自定义订单号
+            if (isNewOrder) {
+                if (StringUtils.isNotBlank(newPayOrderId)) { // 自定义订单号
                     payOrder.setPayOrderId(newPayOrderId);
                 }
                 //订单入库 订单状态： 生成状态  此时没有和任何上游渠道产生交互。
@@ -212,7 +226,7 @@ public abstract class AbstractPayOrderController extends ApiController {
             //处理上游返回数据
             this.processChannelMsg(e.getChannelRetMsg(), payOrder);
 
-            if(e.getChannelRetMsg().getChannelState() == ChannelRetMsg.ChannelState.SYS_ERROR ){
+            if (e.getChannelRetMsg().getChannelState() == ChannelRetMsg.ChannelState.SYS_ERROR) {
                 return ApiRes.customFail(e.getMessage());
             }
 
@@ -225,7 +239,7 @@ public abstract class AbstractPayOrderController extends ApiController {
         }
     }
 
-    private PayOrder genPayOrder(UnifiedOrderRQ rq, MchInfo mchInfo, MchApp mchApp, String ifCode, MchPayPassage mchPayPassage){
+    private PayOrder genPayOrder(UnifiedOrderRQ rq, MchInfo mchInfo, MchApp mchApp, String ifCode, MchPayPassage mchPayPassage) {
 
         PayOrder payOrder = new PayOrder();
         payOrder.setPayOrderId(SeqKit.genPayOrderId()); //生成订单ID
@@ -239,9 +253,9 @@ public abstract class AbstractPayOrderController extends ApiController {
         payOrder.setWayCode(rq.getWayCode()); //支付方式
         payOrder.setAmount(rq.getAmount()); //订单金额
 
-        if(mchPayPassage != null){
+        if (mchPayPassage != null) {
             payOrder.setMchFeeRate(mchPayPassage.getRate()); //商户手续费费率快照
-        }else{
+        } else {
             payOrder.setMchFeeRate(BigDecimal.ZERO); //预下单模式， 按照0计算入库， 后续进行更新
         }
 
@@ -264,9 +278,9 @@ public abstract class AbstractPayOrderController extends ApiController {
         Date nowDate = new Date();
 
         //订单过期时间 单位： 秒
-        if(rq.getExpiredTime() != null){
+        if (rq.getExpiredTime() != null) {
             payOrder.setExpiredTime(DateUtil.offsetSecond(nowDate, rq.getExpiredTime()));
-        }else{
+        } else {
             payOrder.setExpiredTime(DateUtil.offsetHour(nowDate, 2)); //订单过期时间 默认两个小时
         }
 
@@ -278,32 +292,32 @@ public abstract class AbstractPayOrderController extends ApiController {
     /**
      * 校验： 商户的支付方式是否可用
      * 返回： 支付接口
-     * **/
-    private IPaymentService checkMchWayCodeAndGetService(MchAppConfigContext mchAppConfigContext, MchPayPassage mchPayPassage){
+     **/
+    private IPaymentService checkMchWayCodeAndGetService(MchAppConfigContext mchAppConfigContext, MchPayPassage mchPayPassage) {
 
         // 接口代码
         String ifCode = mchPayPassage.getIfCode();
         IPaymentService paymentService = SpringBeansUtil.getBean(ifCode + "PaymentService", IPaymentService.class);
-        if(paymentService == null){
+        if (paymentService == null) {
             throw new BizException("无此支付通道接口");
         }
 
-        if(!paymentService.isSupport(mchPayPassage.getWayCode())){
+        if (!paymentService.isSupport(mchPayPassage.getWayCode())) {
             throw new BizException("接口不支持该支付方式");
         }
 
-        if(mchAppConfigContext.getMchType() == MchInfo.TYPE_NORMAL){ //普通商户
+        if (mchAppConfigContext.getMchType() == MchInfo.TYPE_NORMAL) { //普通商户
 
-            if(configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), ifCode) == null){
+            if (configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), ifCode) == null) {
                 throw new BizException("商户应用参数未配置");
             }
-        }else if(mchAppConfigContext.getMchType() == MchInfo.TYPE_ISVSUB){ //特约商户
+        } else if (mchAppConfigContext.getMchType() == MchInfo.TYPE_ISVSUB) { //特约商户
 
-            if(configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), ifCode) == null){
+            if (configContextQueryService.queryIsvsubMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), ifCode) == null) {
                 throw new BizException("特约商户参数未配置");
             }
 
-            if(configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), ifCode) == null){
+            if (configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), ifCode) == null) {
                 throw new BizException("服务商参数未配置");
             }
         }
@@ -313,57 +327,46 @@ public abstract class AbstractPayOrderController extends ApiController {
     }
 
 
-    /** 处理返回的渠道信息，并更新订单状态
-     *  payOrder将对部分信息进行 赋值操作。
-     * **/
-    private void processChannelMsg(ChannelRetMsg channelRetMsg, PayOrder payOrder){
-
+    /**
+     * 处理返回的渠道信息，并更新订单状态
+     * payOrder将对部分信息进行 赋值操作。
+     **/
+    private void processChannelMsg(ChannelRetMsg channelRetMsg, PayOrder payOrder) {
         //对象为空 || 上游返回状态为空， 则无需操作
-        if(channelRetMsg == null || channelRetMsg.getChannelState() == null){
-            return ;
+        ChannelRetMsg.ChannelState channelState = channelRetMsg.getChannelState();
+        if (channelState == null) {
+            return;
         }
-
         String payOrderId = payOrder.getPayOrderId();
-
         //明确成功
-        if(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS == channelRetMsg.getChannelState()) {
-
+        if (ChannelRetMsg.ChannelState.CONFIRM_SUCCESS == channelState) {
             this.updateInitOrderStateThrowException(PayOrder.STATE_SUCCESS, payOrder, channelRetMsg);
-
             //订单支付成功，其他业务逻辑
             payOrderProcessService.confirmSuccess(payOrder);
-
-        //明确失败
-        }else if(ChannelRetMsg.ChannelState.CONFIRM_FAIL == channelRetMsg.getChannelState()) {
-
+        } else if (ChannelRetMsg.ChannelState.CONFIRM_FAIL == channelState) {
+            //明确失败
             this.updateInitOrderStateThrowException(PayOrder.STATE_FAIL, payOrder, channelRetMsg);
-
-        // 上游处理中 || 未知 || 上游接口返回异常  订单为支付中状态
-        }else if( ChannelRetMsg.ChannelState.WAITING == channelRetMsg.getChannelState() ||
-                  ChannelRetMsg.ChannelState.UNKNOWN == channelRetMsg.getChannelState() ||
-                  ChannelRetMsg.ChannelState.API_RET_ERROR == channelRetMsg.getChannelState()
-
-        ){
+        } else if (WAITING == channelState || UNKNOWN == channelState || API_RET_ERROR == channelState) {
+            // 上游处理中 || 未知 || 上游接口返回异常  订单为支付中状态
             this.updateInitOrderStateThrowException(PayOrder.STATE_ING, payOrder, channelRetMsg);
-
-        // 系统异常：  订单不再处理。  为： 生成状态
-        }else if( ChannelRetMsg.ChannelState.SYS_ERROR == channelRetMsg.getChannelState()){
-
-        }else{
-
+        } else if (ChannelRetMsg.ChannelState.SYS_ERROR == channelState) {
+            // 系统异常：  订单不再处理。  为： 生成状态
+        } else {
             throw new BizException("ChannelState 返回异常！");
         }
 
         //判断是否需要轮询查单
-        if(channelRetMsg.isNeedQuery()){
+        if (channelRetMsg.isNeedQuery()) {
             mqSender.send(PayOrderReissueMQ.build(payOrderId, 1), 5);
         }
 
     }
 
 
-    /** 更新订单状态 --》 订单生成--》 其他状态  (向外抛出异常) **/
-    private void updateInitOrderStateThrowException(byte orderState, PayOrder payOrder, ChannelRetMsg channelRetMsg){
+    /**
+     * 更新订单状态 --》 订单生成--》 其他状态  (向外抛出异常)
+     **/
+    private void updateInitOrderStateThrowException(byte orderState, PayOrder payOrder, ChannelRetMsg channelRetMsg) {
 
         payOrder.setState(orderState);
         payOrder.setChannelOrderNo(channelRetMsg.getChannelOrderId());
@@ -371,7 +374,7 @@ public abstract class AbstractPayOrderController extends ApiController {
         payOrder.setErrMsg(channelRetMsg.getChannelErrMsg());
 
         // 聚合码场景 订单对象存在会员信息， 不可全部以上游为准。
-        if(StringUtils.isNotEmpty(channelRetMsg.getChannelUserId())){
+        if (StringUtils.isNotEmpty(channelRetMsg.getChannelUserId())) {
             payOrder.setChannelUser(channelRetMsg.getChannelUserId());
         }
 
@@ -380,15 +383,17 @@ public abstract class AbstractPayOrderController extends ApiController {
     }
 
 
-    /** 统一封装订单数据  **/
-    private ApiRes packageApiResByPayOrder(UnifiedOrderRQ bizRQ, UnifiedOrderRS bizRS, PayOrder payOrder){
+    /**
+     * 统一封装订单数据
+     **/
+    private ApiRes packageApiResByPayOrder(UnifiedOrderRQ bizRQ, UnifiedOrderRS bizRS, PayOrder payOrder) {
 
         // 返回接口数据
         bizRS.setPayOrderId(payOrder.getPayOrderId());
         bizRS.setOrderState(payOrder.getState());
         bizRS.setMchOrderNo(payOrder.getMchOrderNo());
 
-        if(payOrder.getState() == PayOrder.STATE_FAIL){
+        if (payOrder.getState() == PayOrder.STATE_FAIL) {
             bizRS.setErrCode(bizRS.getChannelRetMsg() != null ? bizRS.getChannelRetMsg().getChannelErrCode() : null);
             bizRS.setErrMsg(bizRS.getChannelRetMsg() != null ? bizRS.getChannelRetMsg().getChannelErrMsg() : null);
         }

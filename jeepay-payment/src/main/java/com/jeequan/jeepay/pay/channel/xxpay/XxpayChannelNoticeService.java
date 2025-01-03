@@ -31,12 +31,12 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 
 /*
-* 小新支付 支付回调接口实现类
-*
-* @author jmdhappy
-* @site https://www.jeequan.com
-* @date 2021/9/21 00:16
-*/
+ * 小新支付 支付回调接口实现类
+ *
+ * @author jmdhappy
+ * @site https://www.jeequan.com
+ * @date 2021/9/21 00:16
+ */
 @Service
 @Slf4j
 public class XxpayChannelNoticeService extends AbstractChannelNoticeService {
@@ -63,18 +63,17 @@ public class XxpayChannelNoticeService extends AbstractChannelNoticeService {
     }
 
 
-
     @Override
     public ChannelRetMsg doNotice(HttpServletRequest request, Object params, PayOrder payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum) {
         try {
-            XxpayNormalMchParams xxpayParams = (XxpayNormalMchParams)configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
+            XxpayNormalMchParams xxpayParams = (XxpayNormalMchParams) configContextQueryService.queryNormalMchParams(mchAppConfigContext.getMchNo(), mchAppConfigContext.getAppId(), getIfCode());
 
             // 获取请求参数
             JSONObject jsonParams = (JSONObject) params;
             String checkSign = jsonParams.getString("sign");
             jsonParams.remove("sign");
             // 验证签名
-            if(!checkSign.equals(XxpayKit.getSign(jsonParams, xxpayParams.getKey()))) {
+            if (!checkSign.equals(XxpayKit.getSign(jsonParams, xxpayParams.getKey()))) {
                 throw ResponseException.buildText("ERROR");
             }
 
@@ -90,7 +89,7 @@ public class XxpayChannelNoticeService extends AbstractChannelNoticeService {
 
             result.setChannelState(ChannelRetMsg.ChannelState.WAITING); // 默认支付中
 
-            if("2".equals(status) || "3".equals(status)){
+            if ("2".equals(status) || "3".equals(status)) {
                 result.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_SUCCESS);
             }
 

@@ -33,15 +33,16 @@ import java.util.Date;
  *  比如初始化配置文件， 读取基础数据， 资源初始化等。 避免在Main函数中写业务代码。
  *  CommandLineRunner  / ApplicationRunner都可以达到要求， 只是调用参数有所不同。
  *
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:17
-*/
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:17
+ */
 @Component
 public class InitRunner implements CommandLineRunner {
 
-    @Autowired private SystemYmlConfig systemYmlConfig;
+    @Autowired
+    private SystemYmlConfig systemYmlConfig;
 
 
     @Override

@@ -21,12 +21,12 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 /*
-* 查询退款单 响应参数
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/17 14:08
-*/
+ * 查询退款单 响应参数
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/17 14:08
+ */
 @Data
 public class QueryRefundOrderRS extends AbstractRS {
 
@@ -106,9 +106,9 @@ public class QueryRefundOrderRS extends AbstractRS {
     private Long createdAt;
 
 
-    public static QueryRefundOrderRS buildByRefundOrder(RefundOrder refundOrder){
+    public static QueryRefundOrderRS buildByRefundOrder(RefundOrder refundOrder) {
 
-        if(refundOrder == null){
+        if (refundOrder == null) {
             return null;
         }
 

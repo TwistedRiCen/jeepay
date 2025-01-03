@@ -15,8 +15,8 @@
  */
 package com.jeequan.jeepay.components.mq.vender.activemq;
 
-import com.jeequan.jeepay.components.mq.model.AbstractMQ;
 import com.jeequan.jeepay.components.mq.constant.MQVenderCS;
+import com.jeequan.jeepay.components.mq.model.AbstractMQ;
 import com.jeequan.jeepay.components.mq.vender.IMQSender;
 import org.apache.activemq.ScheduledMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +27,12 @@ import org.springframework.stereotype.Component;
 import javax.jms.TextMessage;
 
 /**
-*  activeMQ 消息发送器的实现
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/7/23 16:52
-*/
+ * activeMQ 消息发送器的实现
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/7/23 16:52
+ */
 @Component
 @ConditionalOnProperty(name = MQVenderCS.YML_VENDER_KEY, havingValue = MQVenderCS.ACTIVE_MQ)
 public class ActiveMQSender implements IMQSender {
@@ -53,7 +53,7 @@ public class ActiveMQSender implements IMQSender {
         jmsTemplate.send(activeMQConfig.getDestination(mqModel), session -> {
             TextMessage tm = session.createTextMessage(mqModel.toMessage());
             tm.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay * 1000);
-            tm.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_PERIOD, 1*1000);
+            tm.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_PERIOD, 1 * 1000);
             tm.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_REPEAT, 1);
             return tm;
         });

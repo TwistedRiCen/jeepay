@@ -1,6 +1,10 @@
 package com.jeequan.jeepay.components.mq.vender.aliyunrocketmq;
 
-import com.aliyun.openservices.ons.api.*;
+import com.aliyun.openservices.ons.api.Consumer;
+import com.aliyun.openservices.ons.api.ONSFactory;
+import com.aliyun.openservices.ons.api.Producer;
+import com.aliyun.openservices.ons.api.PropertyKeyConst;
+import com.aliyun.openservices.ons.api.PropertyValueConst;
 import com.jeequan.jeepay.components.mq.constant.MQVenderCS;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;

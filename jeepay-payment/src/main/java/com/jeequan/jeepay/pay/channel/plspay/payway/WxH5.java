@@ -84,7 +84,7 @@ public class WxH5 extends PlspayPaymentService {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.WAITING);
             } else {
                 channelRetMsg.setChannelState(ChannelRetMsg.ChannelState.CONFIRM_FAIL);
-                channelRetMsg.setChannelErrCode(response.getCode()+"");
+                channelRetMsg.setChannelErrCode(response.getCode() + "");
                 channelRetMsg.setChannelErrMsg(response.getMsg());
             }
         } catch (JeepayException e) {

@@ -42,11 +42,13 @@ public class PayOrderReissueRabbitMQReceiver implements IMQMsgReceiver {
     @Autowired
     private PayOrderReissueMQ.IMQReceiver mqReceiver;
 
-    /** 接收 【 queue 】 类型的消息 **/
+    /**
+     * 接收 【 queue 】 类型的消息
+     **/
     @Override
     @Async(MqThreadExecutor.EXECUTOR_PAYORDER_MCH_NOTIFY)
     @RabbitListener(queues = PayOrderReissueMQ.MQ_NAME)
-    public void receiveMsg(String msg){
+    public void receiveMsg(String msg) {
         mqReceiver.receive(PayOrderReissueMQ.parse(msg));
     }
 

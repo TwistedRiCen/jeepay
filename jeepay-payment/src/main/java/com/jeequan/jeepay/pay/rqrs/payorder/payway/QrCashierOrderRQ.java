@@ -29,8 +29,10 @@ import lombok.Data;
 @Data
 public class QrCashierOrderRQ extends CommonPayDataRQ {
 
-    /** 构造函数 **/
-    public QrCashierOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public QrCashierOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.QR_CASHIER);
     }
 

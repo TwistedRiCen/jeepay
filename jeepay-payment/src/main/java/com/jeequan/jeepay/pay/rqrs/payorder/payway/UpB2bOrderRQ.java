@@ -29,8 +29,10 @@ import lombok.Data;
 @Data
 public class UpB2bOrderRQ extends CommonPayDataRQ {
 
-    /** 构造函数 **/
-    public UpB2bOrderRQ(){
+    /**
+     * 构造函数
+     **/
+    public UpB2bOrderRQ() {
         this.setWayCode(CS.PAY_WAY_CODE.UP_B2B);
     }
 

@@ -28,9 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MchAppService extends ServiceImpl<MchAppMapper, MchApp> {
 
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private MchPayPassageService mchPayPassageService;
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private MchPayPassageService mchPayPassageService;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
 
     @Transactional(rollbackFor = Exception.class)
     public void removeByAppId(String appId) {
@@ -90,7 +93,7 @@ public class MchAppService extends ServiceImpl<MchAppMapper, MchApp> {
         return pages;
     }
 
-    public MchApp getOneByMch(String mchNo, String appId){
+    public MchApp getOneByMch(String mchNo, String appId) {
         return getOne(MchApp.gw().eq(MchApp::getMchNo, mchNo).eq(MchApp::getAppId, appId));
     }
 

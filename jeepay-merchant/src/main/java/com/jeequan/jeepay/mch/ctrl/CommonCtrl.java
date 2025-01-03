@@ -42,19 +42,24 @@ public abstract class CommonCtrl extends AbstractCtrl {
     @Autowired
     private SysConfigService sysConfigService;
 
-    /** 获取当前用户ID */
-    protected JeeUserDetails getCurrentUser(){
+    /**
+     * 获取当前用户ID
+     */
+    protected JeeUserDetails getCurrentUser() {
 
-        return (JeeUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (JeeUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    /** 获取当前商户ID **/
+    /**
+     * 获取当前商户ID
+     **/
     protected String getCurrentMchNo() {
         return getCurrentUser().getSysUser().getBelongInfoId();
     }
 
     /**
      * 获取当前用户登录IP
+     *
      * @return
      */
     protected String getIp() {
@@ -63,13 +68,14 @@ public abstract class CommonCtrl extends AbstractCtrl {
 
     /**
      * 校验当前用户是否为超管
+     *
      * @return
      */
     protected ApiRes checkIsAdmin() {
         SysUser sysUser = getCurrentUser().getSysUser();
         if (sysUser.getIsAdmin() != CS.YES) {
             return ApiRes.fail(ApiCodeEnum.SYS_PERMISSION_ERROR);
-        }else {
+        } else {
             return null;
         }
 

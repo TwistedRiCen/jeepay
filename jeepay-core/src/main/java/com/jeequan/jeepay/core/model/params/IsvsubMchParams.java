@@ -27,10 +27,10 @@ import com.alibaba.fastjson.JSONObject;
  */
 public abstract class IsvsubMchParams {
 
-    public static IsvsubMchParams factory(String ifCode, String paramsStr){
+    public static IsvsubMchParams factory(String ifCode, String paramsStr) {
 
         try {
-            return (IsvsubMchParams)JSONObject.parseObject(paramsStr, Class.forName(IsvsubMchParams.class.getPackage().getName() +"."+ ifCode +"."+ StrUtil.upperFirst(ifCode) +"IsvsubMchParams"));
+            return (IsvsubMchParams) JSONObject.parseObject(paramsStr, Class.forName(IsvsubMchParams.class.getPackage().getName() + "." + ifCode + "." + StrUtil.upperFirst(ifCode) + "IsvsubMchParams"));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

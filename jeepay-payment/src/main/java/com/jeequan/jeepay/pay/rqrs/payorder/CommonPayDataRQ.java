@@ -18,16 +18,18 @@ package com.jeequan.jeepay.pay.rqrs.payorder;
 import lombok.Data;
 
 /*
-* 通用支付数据RQ
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:31
-*/
+ * 通用支付数据RQ
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:31
+ */
 @Data
 public class CommonPayDataRQ extends UnifiedOrderRQ {
 
-    /** 请求参数： 支付数据包类型 **/
+    /**
+     * 请求参数： 支付数据包类型
+     **/
     private String payDataType;
 
 }

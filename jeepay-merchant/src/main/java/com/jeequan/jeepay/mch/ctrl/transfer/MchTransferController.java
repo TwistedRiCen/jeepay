@@ -41,29 +41,39 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
-* 转账api
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/8/13 14:43
-*/
+ * 转账api
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/8/13 14:43
+ */
 @Api(tags = "商户转账")
 @RestController
 @RequestMapping("/api/mchTransfers")
 public class MchTransferController extends CommonCtrl {
 
-    @Autowired private MchAppService mchAppService;
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
-    @Autowired private PayInterfaceDefineService payInterfaceDefineService;
-    @Autowired private SysConfigService sysConfigService;
+    @Autowired
+    private MchAppService mchAppService;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private PayInterfaceDefineService payInterfaceDefineService;
+    @Autowired
+    private SysConfigService sysConfigService;
 
-    /** 查询商户对应应用下支持的支付通道 **/
+    /**
+     * 查询商户对应应用下支持的支付通道
+     **/
     @ApiOperation("查询商户对应应用下支持的支付通道")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -81,7 +91,7 @@ public class MchTransferController extends CommonCtrl {
                         .eq(PayInterfaceConfig::getState, CS.PUB_USABLE)
         ).stream().forEach(r -> ifCodeList.add(r.getIfCode()));
 
-        if(ifCodeList.isEmpty()){
+        if (ifCodeList.isEmpty()) {
             return ApiRes.ok(ifCodeList);
         }
 
@@ -90,8 +100,9 @@ public class MchTransferController extends CommonCtrl {
     }
 
 
-
-    /** 获取渠道侧用户ID **/
+    /**
+     * 获取渠道侧用户ID
+     **/
     @ApiOperation("获取渠道侧用户ID")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -105,7 +116,7 @@ public class MchTransferController extends CommonCtrl {
 
         String appId = getValStringRequired("appId");
         MchApp mchApp = mchAppService.getById(appId);
-        if(mchApp == null || mchApp.getState() != CS.PUB_USABLE || !mchApp.getMchNo().equals(getCurrentMchNo())){
+        if (mchApp == null || mchApp.getState() != CS.PUB_USABLE || !mchApp.getMchNo().equals(getCurrentMchNo())) {
             throw new BizException("商户应用不存在或不可用");
         }
 
@@ -129,7 +140,9 @@ public class MchTransferController extends CommonCtrl {
     }
 
 
-    /** 调起下单接口 **/
+    /**
+     * 调起下单接口
+     **/
     @ApiOperation("调起转账接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -154,7 +167,7 @@ public class MchTransferController extends CommonCtrl {
         TransferOrderCreateReqModel model = getObject(TransferOrderCreateReqModel.class);
 
         MchApp mchApp = mchAppService.getById(model.getAppId());
-        if(mchApp == null || mchApp.getState() != CS.PUB_USABLE || !mchApp.getMchNo().equals(getCurrentMchNo()) ){
+        if (mchApp == null || mchApp.getState() != CS.PUB_USABLE || !mchApp.getMchNo().equals(getCurrentMchNo())) {
             throw new BizException("商户应用不存在或不可用");
         }
 
@@ -168,7 +181,7 @@ public class MchTransferController extends CommonCtrl {
 
         try {
             TransferOrderCreateResponse response = jeepayClient.execute(request);
-            if(response.getCode() != 0){
+            if (response.getCode() != 0) {
                 throw new BizException(response.getMsg());
             }
             return ApiRes.ok(response.get());

@@ -23,9 +23,7 @@ import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.v3.util.PemUtils;
-import com.jeequan.jeepay.core.constants.CS;
 import com.jeequan.jeepay.core.entity.PayOrder;
-import com.jeequan.jeepay.core.model.params.wxpay.WxpayIsvsubMchParams;
 import com.jeequan.jeepay.pay.channel.wxpay.WxpayPaymentService;
 import com.jeequan.jeepay.pay.channel.wxpay.kits.WxpayKit;
 import com.jeequan.jeepay.pay.channel.wxpay.kits.WxpayV3Util;
@@ -62,7 +60,7 @@ public class WxJsapi extends WxpayPaymentService {
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception{
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception {
 
         WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ) rq;
         WxServiceWrapper wxServiceWrapper = configContextQueryService.getWxServiceWrapper(mchAppConfigContext);
@@ -72,17 +70,17 @@ public class WxJsapi extends WxpayPaymentService {
         WxpayV3OrderRequestModel wxpayV3OrderRequestModel = buildV3OrderRequestModel(payOrder, mchAppConfigContext);
 
         // 特约商户
-        if(mchAppConfigContext.isIsvsubMch()) {
+        if (mchAppConfigContext.isIsvsubMch()) {
 
             // 子商户subAppId不为空
-            if(StringUtils.isNotBlank(wxpayV3OrderRequestModel.getSubAppid())){
+            if (StringUtils.isNotBlank(wxpayV3OrderRequestModel.getSubAppid())) {
                 wxpayV3OrderRequestModel.setPayer(new WxpayV3OrderRequestModel.Payer().setSubOpenid(bizRQ.getOpenid()));
 
-            }else{ // 使用的服务商配置的公众号appId获取
+            } else { // 使用的服务商配置的公众号appId获取
                 wxpayV3OrderRequestModel.setPayer(new WxpayV3OrderRequestModel.Payer().setSpOpenid(bizRQ.getOpenid()));
             }
 
-        }else{ //普通商户 设置openId即可。
+        } else { //普通商户 设置openId即可。
             wxpayV3OrderRequestModel.setPayer(new WxpayV3OrderRequestModel.Payer().setNormalOpenId(bizRQ.getOpenid()));
 
         }
@@ -104,7 +102,7 @@ public class WxJsapi extends WxpayPaymentService {
                         String resultAppId = wxpayV3OrderRequestModel.getNormalAppid();
 
                         // 特约商户
-                        if(mchAppConfigContext.isIsvsubMch()){
+                        if (mchAppConfigContext.isIsvsubMch()) {
                             resultAppId = StringUtils.defaultIfEmpty(wxpayV3OrderRequestModel.getSubAppid(), wxpayV3OrderRequestModel.getSpAppid());
                         }
 
@@ -118,7 +116,7 @@ public class WxJsapi extends WxpayPaymentService {
                                     wxPayUnifiedOrderV3Result.getPayInfo(TradeTypeEnum.JSAPI, resultAppId, null,
                                             PemUtils.loadPrivateKey(fis));
 
-                            JSONObject jsonRes = (JSONObject)JSON.toJSON(jsapiResult);
+                            JSONObject jsonRes = (JSONObject) JSON.toJSON(jsapiResult);
                             jsonRes.put("package", jsonRes.getString("packageValue"));
                             jsonRes.remove("packageValue");
 

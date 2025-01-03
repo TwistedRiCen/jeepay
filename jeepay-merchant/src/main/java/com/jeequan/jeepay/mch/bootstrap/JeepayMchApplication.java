@@ -52,7 +52,9 @@ import java.util.Arrays;
 @Configuration
 public class JeepayMchApplication {
 
-    /** main启动函数 **/
+    /**
+     * main启动函数
+     **/
     public static void main(String[] args) {
 
         //启动项目
@@ -61,9 +63,11 @@ public class JeepayMchApplication {
     }
 
 
-    /** fastJson 配置信息 **/
+    /**
+     * fastJson 配置信息
+     **/
     @Bean
-    public HttpMessageConverters fastJsonConfig(){
+    public HttpMessageConverters fastJsonConfig() {
 
         //新建fast-json转换器
         FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
@@ -81,7 +85,9 @@ public class JeepayMchApplication {
         return new HttpMessageConverters(converter);
     }
 
-    /** Mybatis plus 分页插件 **/
+    /**
+     * Mybatis plus 分页插件
+     **/
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         PaginationInterceptor paginationInterceptor = new PaginationInterceptor();

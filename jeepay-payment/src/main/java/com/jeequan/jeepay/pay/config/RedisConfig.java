@@ -24,12 +24,12 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /*
-* RedisConfig
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:25
-*/
+ * RedisConfig
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:25
+ */
 @Configuration
 public class RedisConfig {
 
@@ -48,7 +48,9 @@ public class RedisConfig {
     @Value("${spring.redis.password}")
     private String password;
 
-    /** 当前系统的redis缓存操作对象 (主对象) **/
+    /**
+     * 当前系统的redis缓存操作对象 (主对象)
+     **/
     @Primary
     @Bean(name = "defaultStringRedisTemplate")
     public StringRedisTemplate sysStringRedisTemplate() {

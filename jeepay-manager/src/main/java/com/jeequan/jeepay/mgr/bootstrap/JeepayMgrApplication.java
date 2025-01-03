@@ -38,12 +38,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 import java.util.Arrays;
 
 /*
-* spring-boot 主启动程序
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2019/11/7 15:19
-*/
+ * spring-boot 主启动程序
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2019/11/7 15:19
+ */
 @SpringBootApplication
 @EnableScheduling
 @EnableSwagger2WebMvc
@@ -52,7 +52,9 @@ import java.util.Arrays;
 @Configuration
 public class JeepayMgrApplication {
 
-    /** main启动函数 **/
+    /**
+     * main启动函数
+     **/
     public static void main(String[] args) {
 
         //启动项目
@@ -61,9 +63,11 @@ public class JeepayMgrApplication {
     }
 
 
-    /** fastJson 配置信息 **/
+    /**
+     * fastJson 配置信息
+     **/
     @Bean
-    public HttpMessageConverters fastJsonConfig(){
+    public HttpMessageConverters fastJsonConfig() {
 
         //新建fast-json转换器
         FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
@@ -81,7 +85,9 @@ public class JeepayMgrApplication {
         return new HttpMessageConverters(converter);
     }
 
-    /** Mybatis plus 分页插件 **/
+    /**
+     * Mybatis plus 分页插件
+     **/
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
@@ -91,7 +97,6 @@ public class JeepayMgrApplication {
         // paginationInterceptor.setLimit(500);
         return paginationInterceptor;
     }
-
 
 
     /**

@@ -23,17 +23,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /*
-* jeepay 扫描图片生成器
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:28
-*/
+ * jeepay 扫描图片生成器
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:28
+ */
 @RestController
 @RequestMapping("/api/scan")
 public class ScanImgController extends AbstractPayOrderController {
 
-    /** 返回 图片地址信息  **/
+    /**
+     * 返回 图片地址信息
+     **/
     @RequestMapping("/imgs/{aesStr}.png")
     public void qrImgs(@PathVariable("aesStr") String aesStr) throws Exception {
         String str = JeepayKit.aesDecode(aesStr);

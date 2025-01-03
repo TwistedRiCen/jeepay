@@ -43,36 +43,32 @@ import java.util.Date;
 @TableName("t_pay_way")
 public class PayWay extends BaseModel implements Serializable {
 
-    public static final LambdaQueryWrapper<PayWay> gw(){
-        return new LambdaQueryWrapper<>();
-    }
-
-    private static final long serialVersionUID=1L;
-
+    private static final long serialVersionUID = 1L;
     /**
      * 支付方式代码  例如： wxpay_jsapi
      */
     @ApiModelProperty(value = "支付方式代码  例如： wxpay_jsapi")
     @TableId
     private String wayCode;
-
     /**
      * 支付方式名称
      */
     @ApiModelProperty(value = "支付方式名称")
     private String wayName;
-
     /**
      * 创建时间
      */
     @ApiModelProperty(value = "创建时间")
     private Date createdAt;
-
     /**
      * 更新时间
      */
     @ApiModelProperty(value = "更新时间")
     private Date updatedAt;
+
+    public static final LambdaQueryWrapper<PayWay> gw() {
+        return new LambdaQueryWrapper<>();
+    }
 
 
 }

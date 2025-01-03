@@ -20,7 +20,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
-import com.jeequan.jeepay.core.utils.DateKit;
 import com.jeequan.jeepay.mch.config.SystemYmlConfig;
 import com.jeequan.jeepay.service.impl.SysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,8 @@ import java.util.Date;
 @Component
 public class InitRunner implements CommandLineRunner {
 
-    @Autowired private SystemYmlConfig systemYmlConfig;
+    @Autowired
+    private SystemYmlConfig systemYmlConfig;
 
 
     @Override

@@ -39,15 +39,16 @@ import java.io.File;
 @Service
 @Slf4j
 @ConditionalOnProperty(name = "isys.oss.service-type", havingValue = "aliyun-oss")
-public class AliyunOssService implements IOssService{
+public class AliyunOssService implements IOssService {
 
-    @Autowired private AliyunOssYmlConfig aliyunOssYmlConfig;
+    @Autowired
+    private AliyunOssYmlConfig aliyunOssYmlConfig;
 
     // ossClient 初始化
     private OSS ossClient = null;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         ossClient = new OSSClientBuilder().build(aliyunOssYmlConfig.getEndpoint(), aliyunOssYmlConfig.getAccessKeyId(), aliyunOssYmlConfig.getAccessKeySecret());
     }
 
@@ -59,7 +60,7 @@ public class AliyunOssService implements IOssService{
             this.ossClient.putObject(ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? aliyunOssYmlConfig.getPublicBucketName() : aliyunOssYmlConfig.getPrivateBucketName()
                     , saveDirAndFileName, multipartFile.getInputStream());
 
-            if(ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC){
+            if (ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC) {
                 // 文档：https://www.alibabacloud.com/help/zh/doc-detail/39607.htm  example: https://BucketName.Endpoint/ObjectName
                 return "https://" + aliyunOssYmlConfig.getPublicBucketName() + "." + aliyunOssYmlConfig.getEndpoint() + "/" + saveDirAndFileName;
             }

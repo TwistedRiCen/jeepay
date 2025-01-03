@@ -19,13 +19,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class PppayPayOrderQueryService implements IPayOrderQueryService {
 
+    @Autowired
+    private ConfigContextQueryService configContextQueryService;
+
     @Override
     public String getIfCode() {
         return CS.IF_CODE.PPPAY;
     }
-
-    @Autowired
-    private ConfigContextQueryService configContextQueryService;
 
     @Override
     public ChannelRetMsg query(PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception {

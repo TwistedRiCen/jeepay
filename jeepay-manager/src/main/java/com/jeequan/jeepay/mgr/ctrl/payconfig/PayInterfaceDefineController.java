@@ -34,7 +34,13 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -50,15 +56,18 @@ import java.util.List;
 @RequestMapping("api/payIfDefines")
 public class PayInterfaceDefineController extends CommonCtrl {
 
-    @Autowired private PayInterfaceDefineService payInterfaceDefineService;
-    @Autowired private PayOrderService payOrderService;
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private PayInterfaceDefineService payInterfaceDefineService;
+    @Autowired
+    private PayOrderService payOrderService;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
 
     /**
      * @Author: ZhuXiao
      * @Description: list
      * @Date: 15:51 2021/4/27
-    */
+     */
     @ApiOperation("支付接口--列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header")
@@ -78,7 +87,7 @@ public class PayInterfaceDefineController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: detail
      * @Date: 15:51 2021/4/27
-    */
+     */
     @ApiOperation("支付接口--详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -94,7 +103,7 @@ public class PayInterfaceDefineController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: add
      * @Date: 15:51 2021/4/27
-    */
+     */
     @ApiOperation("支付接口--新增")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -138,7 +147,7 @@ public class PayInterfaceDefineController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: update
      * @Date: 15:51 2021/4/27
-    */
+     */
     @ApiOperation("支付接口--更新")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),
@@ -184,7 +193,7 @@ public class PayInterfaceDefineController extends CommonCtrl {
      * @Author: ZhuXiao
      * @Description: delete
      * @Date: 15:52 2021/4/27
-    */
+     */
     @ApiOperation("支付接口--删除")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "iToken", value = "用户身份凭证", required = true, paramType = "header"),

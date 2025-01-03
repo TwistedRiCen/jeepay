@@ -27,7 +27,6 @@ import com.jeequan.jeepay.core.model.params.ysf.YsfpayIsvsubMchParams;
 import com.jeequan.jeepay.pay.channel.AbstractPaymentService;
 import com.jeequan.jeepay.pay.channel.ysfpay.utils.YsfHttpUtil;
 import com.jeequan.jeepay.pay.channel.ysfpay.utils.YsfSignUtils;
-import com.jeequan.jeepay.pay.model.IsvConfigContext;
 import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
 import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
@@ -49,6 +48,47 @@ import java.util.Date;
 @Slf4j
 public class YsfpayPaymentService extends AbstractPaymentService {
 
+    /**
+     * 获取云闪付正式环境/沙箱HOST地址
+     **/
+    public static String getYsfpayHost4env(YsfpayIsvParams isvParams) {
+        return CS.YES == isvParams.getSandbox() ? YsfpayConfig.SANDBOX_SERVER_URL : YsfpayConfig.PROD_SERVER_URL;
+    }
+
+    /**
+     * 云闪付 jsapi下单请求统一发送参数
+     **/
+    public static void jsapiParamsSet(JSONObject reqParams, PayOrder payOrder, String notifyUrl, String returnUrl) {
+        String orderType = YsfHttpUtil.getOrderTypeByJSapi(payOrder.getWayCode());
+        reqParams.put("orderType", orderType); //订单类型： alipayJs-支付宝， wechatJs-微信支付， upJs-银联二维码
+        ysfPublicParams(reqParams, payOrder);
+        reqParams.put("backUrl", notifyUrl); //交易通知地址
+        reqParams.put("frontUrl", returnUrl); //前台通知地址
+    }
+
+    /**
+     * 云闪付 bar下单请求统一发送参数
+     **/
+    public static void barParamsSet(JSONObject reqParams, PayOrder payOrder) {
+        String orderType = YsfHttpUtil.getOrderTypeByBar(payOrder.getWayCode());
+        reqParams.put("orderType", orderType); //订单类型： alipay-支付宝， wechat-微信支付， -unionpay银联二维码
+        ysfPublicParams(reqParams, payOrder);
+        // TODO 终端编号暂时写死
+        reqParams.put("termId", "01727367"); // 终端编号
+    }
+
+    /**
+     * 云闪付公共参数赋值
+     **/
+    public static void ysfPublicParams(JSONObject reqParams, PayOrder payOrder) {
+        //获取订单类型
+        reqParams.put("orderNo", payOrder.getPayOrderId()); //订单号
+        reqParams.put("orderTime", DateUtil.format(new Date(), DatePattern.PURE_DATETIME_PATTERN)); //订单时间 如：20180702142900
+        reqParams.put("txnAmt", payOrder.getAmount()); //交易金额 单位：分，不带小数点
+        reqParams.put("currencyCode", "156"); //交易币种 不出现则默认为人民币-156
+        reqParams.put("orderInfo", payOrder.getSubject()); //订单信息 订单描述信息，如：京东生鲜食品
+    }
+
     @Override
     public String getIfCode() {
         return CS.IF_CODE.YSFPAY;
@@ -69,11 +109,12 @@ public class YsfpayPaymentService extends AbstractPaymentService {
         return PaywayUtil.getRealPaywayService(this, payOrder.getWayCode()).pay(rq, payOrder, mchAppConfigContext);
     }
 
-
-    /** 封装参数 & 统一请求 **/
+    /**
+     * 封装参数 & 统一请求
+     **/
     public JSONObject packageParamAndReq(String apiUri, JSONObject reqParams, String logPrefix, MchAppConfigContext mchAppConfigContext) throws Exception {
 
-        YsfpayIsvParams isvParams = (YsfpayIsvParams)configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
+        YsfpayIsvParams isvParams = (YsfpayIsvParams) configContextQueryService.queryIsvParams(mchAppConfigContext.getMchInfo().getIsvNo(), getIfCode());
 
         if (isvParams.getSerProvId() == null) {
             log.error("服务商配置为空：isvParams：{}", isvParams);
@@ -94,42 +135,9 @@ public class YsfpayPaymentService extends AbstractPaymentService {
         String resText = YsfHttpUtil.doPostJson(getYsfpayHost4env(isvParams) + apiUri, null, reqParams);
         log.info("{} resJSON={}", logPrefix, resText);
 
-        if(StringUtils.isEmpty(resText)){
+        if (StringUtils.isEmpty(resText)) {
             return null;
         }
         return JSONObject.parseObject(resText);
-    }
-
-    /** 获取云闪付正式环境/沙箱HOST地址   **/
-    public static String getYsfpayHost4env(YsfpayIsvParams isvParams){
-        return CS.YES == isvParams.getSandbox() ? YsfpayConfig.SANDBOX_SERVER_URL : YsfpayConfig.PROD_SERVER_URL;
-    }
-
-    /** 云闪付 jsapi下单请求统一发送参数 **/
-    public static void jsapiParamsSet(JSONObject reqParams, PayOrder payOrder, String notifyUrl, String returnUrl) {
-        String orderType = YsfHttpUtil.getOrderTypeByJSapi(payOrder.getWayCode());
-        reqParams.put("orderType", orderType); //订单类型： alipayJs-支付宝， wechatJs-微信支付， upJs-银联二维码
-        ysfPublicParams(reqParams, payOrder);
-        reqParams.put("backUrl", notifyUrl); //交易通知地址
-        reqParams.put("frontUrl", returnUrl); //前台通知地址
-    }
-
-    /** 云闪付 bar下单请求统一发送参数 **/
-    public static void barParamsSet(JSONObject reqParams, PayOrder payOrder) {
-        String orderType = YsfHttpUtil.getOrderTypeByBar(payOrder.getWayCode());
-        reqParams.put("orderType", orderType); //订单类型： alipay-支付宝， wechat-微信支付， -unionpay银联二维码
-        ysfPublicParams(reqParams, payOrder);
-        // TODO 终端编号暂时写死
-        reqParams.put("termId", "01727367"); // 终端编号
-    }
-
-    /** 云闪付公共参数赋值 **/
-    public static void ysfPublicParams(JSONObject reqParams, PayOrder payOrder) {
-        //获取订单类型
-        reqParams.put("orderNo", payOrder.getPayOrderId()); //订单号
-        reqParams.put("orderTime", DateUtil.format(new Date(), DatePattern.PURE_DATETIME_PATTERN)); //订单时间 如：20180702142900
-        reqParams.put("txnAmt", payOrder.getAmount()); //交易金额 单位：分，不带小数点
-        reqParams.put("currencyCode", "156"); //交易币种 不出现则默认为人民币-156
-        reqParams.put("orderInfo", payOrder.getSubject()); //订单信息 订单描述信息，如：京东生鲜食品
     }
 }

@@ -37,9 +37,9 @@ public class YsfJsapiOrderController extends AbstractPayOrderController {
 
     /**
      * 统一下单接口
-     * **/
+     **/
     @PostMapping("/api/pay/ysfJsapiOrder")
-    public ApiRes aliJsapiOrder(){
+    public ApiRes aliJsapiOrder() {
 
         //获取参数 & 验证
         YsfJsapiOrderRQ bizRQ = getRQByWithMchSign(YsfJsapiOrderRQ.class);

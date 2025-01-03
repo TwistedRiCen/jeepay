@@ -29,17 +29,20 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
 /*
-* 实现回调接口抽象类
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:18
-*/
+ * 实现回调接口抽象类
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:18
+ */
 public abstract class AbstractChannelNoticeService implements IChannelNoticeService {
 
-    @Autowired private RequestKitBean requestKitBean;
-    @Autowired private ChannelCertConfigKitBean channelCertConfigKitBean;
-    @Autowired protected ConfigContextQueryService configContextQueryService;
+    @Autowired
+    protected ConfigContextQueryService configContextQueryService;
+    @Autowired
+    private RequestKitBean requestKitBean;
+    @Autowired
+    private ChannelCertConfigKitBean channelCertConfigKitBean;
 
     @Override
     public ResponseEntity doNotifyOrderNotExists(HttpServletRequest request) {
@@ -51,16 +54,20 @@ public abstract class AbstractChannelNoticeService implements IChannelNoticeServ
         return textResp("update status error");
     }
 
-    /** 文本类型的响应数据 **/
-    protected ResponseEntity textResp(String text){
+    /**
+     * 文本类型的响应数据
+     **/
+    protected ResponseEntity textResp(String text) {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.TEXT_HTML);
         return new ResponseEntity(text, httpHeaders, HttpStatus.OK);
     }
 
-    /** json类型的响应数据 **/
-    protected ResponseEntity jsonResp(Object body){
+    /**
+     * json类型的响应数据
+     **/
+    protected ResponseEntity jsonResp(Object body) {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -68,22 +75,30 @@ public abstract class AbstractChannelNoticeService implements IChannelNoticeServ
     }
 
 
-    /**request.getParameter 获取参数 并转换为JSON格式 **/
+    /**
+     * request.getParameter 获取参数 并转换为JSON格式
+     **/
     protected JSONObject getReqParamJSON() {
         return requestKitBean.getReqParamJSON();
     }
 
-    /**request.getParameter 获取参数 并转换为JSON格式 **/
+    /**
+     * request.getParameter 获取参数 并转换为JSON格式
+     **/
     protected String getReqParamFromBody() {
         return requestKitBean.getReqParamFromBody();
     }
 
-    /** 获取文件路径 **/
+    /**
+     * 获取文件路径
+     **/
     protected String getCertFilePath(String certFilePath) {
         return channelCertConfigKitBean.getCertFilePath(certFilePath);
     }
 
-    /** 获取文件File对象 **/
+    /**
+     * 获取文件File对象
+     **/
     protected File getCertFile(String certFilePath) {
         return channelCertConfigKitBean.getCertFile(certFilePath);
     }

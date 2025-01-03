@@ -16,8 +16,8 @@
 package com.jeequan.jeepay.service.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
 import com.jeequan.jeepay.core.entity.SysUserAuth;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -29,7 +29,7 @@ import com.jeequan.jeepay.core.entity.SysUserAuth;
  */
 public interface SysUserAuthMapper extends BaseMapper<SysUserAuth> {
 
-    SysUserAuth selectByLogin(@Param("identifier")String identifier,
-                              @Param("identityType")Byte identityType, @Param("sysType")String sysType);
+    SysUserAuth selectByLogin(@Param("identifier") String identifier,
+                              @Param("identityType") Byte identityType, @Param("sysType") String sysType);
 
 }

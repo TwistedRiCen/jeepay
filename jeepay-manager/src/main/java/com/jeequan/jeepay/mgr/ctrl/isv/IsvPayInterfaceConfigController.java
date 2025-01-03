@@ -34,7 +34,11 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -51,20 +55,22 @@ import java.util.List;
 @RequestMapping("/api/isv/payConfigs")
 public class IsvPayInterfaceConfigController extends CommonCtrl {
 
-    @Autowired private PayInterfaceConfigService payInterfaceConfigService;
-    @Autowired private IMQSender mqSender;
+    @Autowired
+    private PayInterfaceConfigService payInterfaceConfigService;
+    @Autowired
+    private IMQSender mqSender;
 
-   /**
-    * @Author: ZhuXiao
-    * @Description: 查询服务商支付接口配置列表
-    * @Date: 16:45 2021/4/27
-   */
-   @ApiOperation("查询服务商支付接口配置列表")
-   @ApiImplicitParams({
-           @ApiImplicitParam(name = CS.ACCESS_TOKEN_NAME, value = "用户身份凭证", required = true, paramType = "header"),
-           @ApiImplicitParam(name = "isvNo", value = "服务商号", required = true)
-   })
-   @PreAuthorize("hasAuthority('ENT_ISV_PAY_CONFIG_LIST')")
+    /**
+     * @Author: ZhuXiao
+     * @Description: 查询服务商支付接口配置列表
+     * @Date: 16:45 2021/4/27
+     */
+    @ApiOperation("查询服务商支付接口配置列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = CS.ACCESS_TOKEN_NAME, value = "用户身份凭证", required = true, paramType = "header"),
+            @ApiImplicitParam(name = "isvNo", value = "服务商号", required = true)
+    })
+    @PreAuthorize("hasAuthority('ENT_ISV_PAY_CONFIG_LIST')")
     @GetMapping
     public ApiRes<List<PayInterfaceDefine>> list() {
 
@@ -147,7 +153,7 @@ public class IsvPayInterfaceConfigController extends CommonCtrl {
 
             // 合并支付参数
             payInterfaceConfig.setIfParams(StringKit.marge(dbRecoed.getIfParams(), payInterfaceConfig.getIfParams()));
-        }else {
+        } else {
             payInterfaceConfig.setCreatedUid(userId);
             payInterfaceConfig.setCreatedBy(realName);
         }

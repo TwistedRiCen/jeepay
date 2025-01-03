@@ -23,7 +23,6 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,9 +42,11 @@ public class PayOrderDivisionRocketMQReceiver implements IMQMsgReceiver, RocketM
     @Autowired
     private PayOrderDivisionMQ.IMQReceiver mqReceiver;
 
-    /** 接收 【 queue 】 类型的消息 **/
+    /**
+     * 接收 【 queue 】 类型的消息
+     **/
     @Override
-    public void receiveMsg(String msg){
+    public void receiveMsg(String msg) {
         mqReceiver.receive(PayOrderDivisionMQ.parse(msg));
     }
 

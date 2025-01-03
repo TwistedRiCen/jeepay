@@ -19,22 +19,26 @@ package com.jeequan.jeepay.pay.util;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
 
 /*
-* api响应结果构造器
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/6/8 17:45
-*/
+ * api响应结果构造器
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/6/8 17:45
+ */
 public class ApiResBuilder {
 
-    /** 构建自定义响应对象, 默认响应成功 **/
-    public static <T extends AbstractRS> T buildSuccess(Class<? extends AbstractRS> T){
+    /**
+     * 构建自定义响应对象, 默认响应成功
+     **/
+    public static <T extends AbstractRS> T buildSuccess(Class<? extends AbstractRS> T) {
 
         try {
-            T result = (T)T.newInstance();
+            T result = (T) T.newInstance();
             return result;
 
-        } catch (Exception e) { return null; }
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

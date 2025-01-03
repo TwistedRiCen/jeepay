@@ -44,9 +44,11 @@ public class PayOrderReissueRocketMQReceiver implements IMQMsgReceiver, RocketMQ
     @Autowired
     private PayOrderReissueMQ.IMQReceiver mqReceiver;
 
-    /** 接收 【 queue 】 类型的消息 **/
+    /**
+     * 接收 【 queue 】 类型的消息
+     **/
     @Override
-    public void receiveMsg(String msg){
+    public void receiveMsg(String msg) {
         mqReceiver.receive(PayOrderReissueMQ.parse(msg));
     }
 

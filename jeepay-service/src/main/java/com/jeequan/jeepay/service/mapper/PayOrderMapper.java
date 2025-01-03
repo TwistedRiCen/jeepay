@@ -38,6 +38,8 @@ public interface PayOrderMapper extends BaseMapper<PayOrder> {
 
     List<Map> selectOrderCount(Map param);
 
-    /** 更新订单退款金额和次数 **/
+    /**
+     * 更新订单退款金额和次数
+     **/
     int updateRefundAmountAndCount(@Param("payOrderId") String payOrderId, @Param("currentRefundAmount") Long currentRefundAmount);
 }

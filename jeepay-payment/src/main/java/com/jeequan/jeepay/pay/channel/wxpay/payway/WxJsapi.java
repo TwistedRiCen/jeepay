@@ -26,14 +26,14 @@ import com.jeequan.jeepay.core.entity.PayOrder;
 import com.jeequan.jeepay.core.exception.BizException;
 import com.jeequan.jeepay.pay.channel.wxpay.WxpayPaymentService;
 import com.jeequan.jeepay.pay.channel.wxpay.kits.WxpayKit;
+import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import com.jeequan.jeepay.pay.model.WxServiceWrapper;
 import com.jeequan.jeepay.pay.rqrs.AbstractRS;
+import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.rqrs.payorder.UnifiedOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxJsapiOrderRQ;
 import com.jeequan.jeepay.pay.rqrs.payorder.payway.WxJsapiOrderRS;
-import com.jeequan.jeepay.pay.rqrs.msg.ChannelRetMsg;
 import com.jeequan.jeepay.pay.util.ApiResBuilder;
-import com.jeequan.jeepay.pay.model.MchAppConfigContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class WxJsapi extends WxpayPaymentService {
     public String preCheck(UnifiedOrderRQ rq, PayOrder payOrder) {
 
         WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ) rq;
-        if(StringUtils.isEmpty(bizRQ.getOpenid())){
+        if (StringUtils.isEmpty(bizRQ.getOpenid())) {
             throw new BizException("[openid]不可为空");
         }
 
@@ -61,15 +61,15 @@ public class WxJsapi extends WxpayPaymentService {
     }
 
     @Override
-    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception{
+    public AbstractRS pay(UnifiedOrderRQ rq, PayOrder payOrder, MchAppConfigContext mchAppConfigContext) throws Exception {
 
         WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ) rq;
 
         WxPayUnifiedOrderRequest req = buildUnifiedOrderRequest(payOrder, mchAppConfigContext);
         req.setTradeType(WxPayConstants.TradeType.JSAPI);
-        if(mchAppConfigContext.isIsvsubMch() && StringUtils.isNotBlank(req.getSubAppId())){ // 特约商户 && 传了子商户appId
+        if (mchAppConfigContext.isIsvsubMch() && StringUtils.isNotBlank(req.getSubAppId())) { // 特约商户 && 传了子商户appId
             req.setSubOpenid(bizRQ.getOpenid()); // 用户在子商户appid下的唯一标识
-        }else {
+        } else {
             req.setOpenid(bizRQ.getOpenid());
         }
 

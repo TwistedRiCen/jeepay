@@ -9,7 +9,12 @@ import com.paypal.core.PayPalEnvironment;
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
 import com.paypal.http.serializer.Json;
-import com.paypal.orders.*;
+import com.paypal.orders.Capture;
+import com.paypal.orders.Order;
+import com.paypal.orders.OrderRequest;
+import com.paypal.orders.OrdersCaptureRequest;
+import com.paypal.orders.OrdersGetRequest;
+import com.paypal.orders.PurchaseUnit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,6 +45,20 @@ public class PaypalWrapper {
 
     private String notifyWebhook;
     private String refundWebhook;
+
+    public static PaypalWrapper buildPaypalWrapper(PppayNormalMchParams ppPayNormalMchParams) {
+        PaypalWrapper paypalWrapper = new PaypalWrapper();
+        PayPalEnvironment environment = new PayPalEnvironment.Live(ppPayNormalMchParams.getClientId(), ppPayNormalMchParams.getSecret());
+        if (ppPayNormalMchParams.getSandbox() == 1) {
+            environment = new PayPalEnvironment.Sandbox(ppPayNormalMchParams.getClientId(), ppPayNormalMchParams.getSecret());
+        }
+        paypalWrapper.setEnvironment(environment);
+        paypalWrapper.setClient(new PayPalHttpClient(environment));
+        paypalWrapper.setNotifyWebhook(ppPayNormalMchParams.getNotifyWebhook());
+        paypalWrapper.setRefundWebhook(ppPayNormalMchParams.getRefundWebhook());
+        return paypalWrapper;
+
+    }
 
     public ChannelRetMsg processOrder(String token, PayOrder payOrder) throws IOException {
         return processOrder(token, payOrder, false);
@@ -190,20 +209,6 @@ public class PaypalWrapper {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.TEXT_HTML);
         return new ResponseEntity(text, httpHeaders, HttpStatus.OK);
-    }
-
-    public static PaypalWrapper buildPaypalWrapper(PppayNormalMchParams ppPayNormalMchParams){
-        PaypalWrapper paypalWrapper = new PaypalWrapper();
-        PayPalEnvironment environment = new PayPalEnvironment.Live(ppPayNormalMchParams.getClientId(), ppPayNormalMchParams.getSecret());
-        if (ppPayNormalMchParams.getSandbox() == 1) {
-            environment = new PayPalEnvironment.Sandbox(ppPayNormalMchParams.getClientId(), ppPayNormalMchParams.getSecret());
-        }
-        paypalWrapper.setEnvironment(environment);
-        paypalWrapper.setClient(new PayPalHttpClient(environment));
-        paypalWrapper.setNotifyWebhook(ppPayNormalMchParams.getNotifyWebhook());
-        paypalWrapper.setRefundWebhook(ppPayNormalMchParams.getRefundWebhook());
-        return paypalWrapper;
-
     }
 
 }

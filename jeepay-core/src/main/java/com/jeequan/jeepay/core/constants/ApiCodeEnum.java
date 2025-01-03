@@ -16,13 +16,13 @@
 package com.jeequan.jeepay.core.constants;
 
 /*
-* 接口返回码
-*
-* @author terrfly
-* @site https://www.jeequan.com
-* @date 2021/5/24 17:07
-*/
-public enum ApiCodeEnum{
+ * 接口返回码
+ *
+ * @author terrfly
+ * @site https://www.jeequan.com
+ * @date 2021/5/24 17:07
+ */
+public enum ApiCodeEnum {
 
     SUCCESS(0, "SUCCESS"), //请求成功
 
@@ -48,7 +48,7 @@ public enum ApiCodeEnum{
         this.msg = msg;
     }
 
-    public int getCode(){
+    public int getCode() {
         return this.code;
     }
 
